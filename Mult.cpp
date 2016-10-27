@@ -94,22 +94,9 @@ Long Long::divide(const Long & b, Long& rem) const
 ull binsearch(const Long& a, const Long& b, Long& pr, ull l, ull r) {
 	auto mid = (r + l) / 2;
 	auto _l = l, _r = r, mid_pr = mid;
-	/*
-	bool *I_was = new bool[mid * 2];
-	int ii = 0;
-	while (ii < mid * 2) {
-		I_was[ii++] = false;
-	}
-	*/
 	do {
 		pr = b.mul(mid);
 		mid_pr = mid;
-		/*
-		if (I_was[mid])
-			break;
-		else
-			I_was[mid] = true;
-		*/
 		if (pr < a) 
 			l = mid;
 		else if (pr > a) 

@@ -33,7 +33,7 @@ Long Long::operator*(const Long & o) const
 	else if (size() < toom3naive || o.size() < toom3naive)
 		return karac_mul(o);
 	else
-		return toomcook_mul(o);
+		return strassen_mul(o);
 }
 Long Long::operator/(const int o) const
 {

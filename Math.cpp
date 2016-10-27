@@ -46,9 +46,9 @@ Long pow_mod(const Long& x, const Long& y, const Long& N) {
     Long s = pone, t = x, u = y;
     while (u != null) {
         if (isodd(u))
-            s = (s.strassen_mul(t)) % N;
+            s = (s * (t)) % N;
         u = u / 2;
-        t = (t.strassen_mul(t)) % N;
+        t = (t * (t)) % N;
     }
     return s;
 }
@@ -57,9 +57,9 @@ Long pow(const Long & a, const Long & n) {
     auto _n = n, _a = a;
     while (_n != 0) {
         if (isodd(_n)) {
-            res = res.strassen_mul(_a);
+            res = res * (_a);
         }
-        _a = _a.strassen_mul(_a);
+        _a = _a * (_a);
         _n = _n / 2;
     }
     return res;
