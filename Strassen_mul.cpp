@@ -24,12 +24,13 @@ Long Long::strassen_mul(const Long & b) const
 	fft::calc_rev(n);
 	
 	std::thread da_tr(&fft::trans, da, std::ref(fa), false);
-	std::thread db_tr(&fft::trans, db, std::ref(fb), false);
+	//std::thread db_tr(&fft::trans, db, std::ref(fb), false);
+	db.trans(std::ref(fb), false);
 
 	if (da_tr.joinable())
 	 	da_tr.join();
-	if (db_tr.joinable())
-	 	db_tr.join();
+	//if (db_tr.joinable())
+	// 	db_tr.join();
 
 	for (uint i = 0; i < n; ++i)
 		fa[i] *= fb[i];
