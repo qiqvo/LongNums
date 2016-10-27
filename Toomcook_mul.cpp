@@ -4,13 +4,18 @@
 
 Long Long::toomcook_mul(const Long & b) const
 {
-	if (size() < toom3naive || b.size() < toom3naive)
-		return karac_mul(b);
+	if (size() < toom3naive && b.size() < toom3naive)
+		return mul(b);
 
 	const int k = 3;
 	const int k2 = 5;
 
-	auto km = std::max(size(), b.size());
+	auto km = std::max(size(), b.size()) / 3;
+	if (km * 3 < std::max(size(), b.size()))
+		km += 1;
+
+	if (km == 0)
+		return mul(b);
 
 	bool fl = (bool)(sign * b.sign);
 
@@ -23,8 +28,9 @@ Long Long::toomcook_mul(const Long & b) const
 		if( mode == 2)
 		    mode = km + km;
 		for (uint i = mode; i < km + mode; ++i) {
-			wh.a[i] = what[i];
+			wh.a[i - mode] = what[i];
 		}
+		wh.normal();
 	};
 	for (auto i = 0; i < k; ++i){
 		U[i] = Long(vector<ull>(km, (ull)0));
@@ -76,7 +82,6 @@ Long Long::toomcook_mul(const Long & b) const
 	Res[2] = Res[2] + Res[1] - Res[4];
 	Res[1] = Res[1] - Res[3];
 
-	return ((Res[4].insert(vector<ull>(km + km, 0)) + Res[2]).insert(vector<ull>(km + km, 0)) + Res[0]
-		+ Res[1].insert(vector<ull>(km, 0)) + Res[3].insert(vector<ull>(km + km + km, 0))).changeSign(fl);
+	return (((Res[4].insert(vector<ull>(km + km, 0)) + Res[2]).insert(vector<ull>(km + km, 0)) + Res[0]
+		+ (Res[3].insert(vector<ull>(km + km, 0)) + Res[1]).insert(vector<ull>(km, 0))).changeSign(fl));
 }
-

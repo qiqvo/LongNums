@@ -14,19 +14,15 @@
 #define _USE_MATH_DEFINES
 #define PI 3.14159265358979323846
 
-	//#define KARALOG
 #define DEBUG
 
-	using std::vector;
-	using std::swap;
-	typedef unsigned int uint;
-	typedef unsigned short ush;
-	typedef std::complex<double> ReIm;
-	typedef unsigned long long ull;
-
-
-#ifndef LONGCLASS
-    #define LONGCLASS
+using std::vector;
+using std::swap;
+typedef unsigned int uint;
+typedef unsigned short ush;
+typedef std::complex<double> ReIm;
+typedef unsigned long long ull;
+	
 class Long
 {
 protected:
@@ -38,7 +34,7 @@ protected:
 
 	void insert(ull v = 0);
 	Long insert(vector<ull>);
-	void shift(uint n = 1);
+	Long shift(uint n = 1);
 	Long normal();
 
 	vector<ull> a;   // 2383597  --->   a == { 7 , 9 , 5 , 3 ... 2 }
@@ -136,4 +132,3 @@ double prtest_RabinMiller(const Long & p, ull iter);
 Long Jacobi(Long& a, Long& b);
 
 std::string my_to_string(const ull& a, const int base);
-#endif

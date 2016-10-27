@@ -1,14 +1,14 @@
 #include "Long.h"
- 
- 
-
 
 Long Long::karac_mul(const Long & b) const
 {
-	if ((size() < karacnaive || b.size() < karacnaive)) {
+	if ((size() < karacnaive && b.size() < karacnaive)) {
 		return mul(b);
 	}
 	auto k = std::max(size(), b.size()) / 2;
+	if (k * 2 < std::max(size(), b.size()))
+		k += 1;
+
 	if (k == 0)
 		return mul(b);
 
@@ -29,15 +29,23 @@ Long Long::karac_mul(const Long & b) const
 			wh.a[i - k] = what[i];
 		}
 	};
-	f1(xr, a);
-	f1(yr, b);
-	f2(xl, a);
-	f2(yl, b);
+	auto f = [k](Long& wh, const Long& what, int mode) {
+		if (mode == 1)
+			mode = k;
+		for (uint i = mode; i < k + mode; ++i) {
+			wh.a[i - mode] = what[i];
+		}
+		wh.normal();
+	};
+	f(xr, *this, 0);
+	f(yr, b, 0);
+	f(xl, *this, 1);
+	f(yl, b, 1);
 
 	Long xlyl = xl.karac_mul(yl);
 	Long xryr = xr.karac_mul(yr);
-	Long xxyy = (xl + xr).karac_mul(yl + yr) - (xlyl + xryr);
+	// Long xxyy = (xl + xr).karac_mul(yl + yr) - (xlyl + xryr);
 
 	return (Long().insert(xlyl.a).insert(vector<ull>(2 * k, 0)) + xryr 
-		+ xxyy.insert(vector<ull>(k, 0))).changeSign(fl);
+		+ ((xl + xr).karac_mul(yl + yr) - (xlyl + xryr)).insert(vector<ull>(k, 0))).changeSign(fl);
 }

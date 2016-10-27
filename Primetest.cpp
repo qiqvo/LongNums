@@ -110,14 +110,14 @@
 			{return a < p && a != null;}
 			);
 			std::thread testthr[4] = {
-				{ _met, std::ref(a[0]), (p) },
-				{ _met, std::ref(a[1]), (p) },
-				{ _met, std::ref(a[2]), (p) },
-				{ _met, std::ref(a[3]), (p) },
+				std::thread ( _met, a[0], (p) ),
+				std::thread ( _met, a[1], (p) ),
+				std::thread ( _met, a[2], (p) ),
+				std::thread ( _met, a[3], (p) ),
 			};    
             
 			for (auto& th : testthr) {
-				if (th.joinable())
+				if (th.joinable()) 
 					th.join();
 			}
 		}

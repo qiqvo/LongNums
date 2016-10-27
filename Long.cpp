@@ -32,7 +32,7 @@ inline std::string my_to_string(const ull& a, const int base)
 
 const ull Long::base = 10000;
 const ull Long::karacnaive = 5;
-const ull Long::toom3naive = 6;
+const ull Long::toom3naive = 5;
 
 Long::Long() : sign(true) {}
 
@@ -122,11 +122,12 @@ Long Long::insert(vector<ull> x)
 	return *this;
 }
 
-void Long::shift(uint n)
+Long Long::shift(uint n)
 {
 	while (n-- > 0) {
 		a.emplace(a.begin(), (ull)0);
 	}
+	return *this;
 }
 Long Long::changeSign(int b)
 {
@@ -256,6 +257,7 @@ Long Long::set(ull v, bool s)
 
 Long Long::operator=(const char* v)
 {
+	clear();
 	ull e = 0; uint size = 0;
 	while (*(v++)) ++size;
 	if (size == 0)
@@ -299,6 +301,7 @@ Long Long::operator=(const char* v)
 
 Long Long::operator=(vector<ull> x)
 {
+	clear();
 	insert(x);
 	sign = true;
 	return *this;

@@ -109,16 +109,37 @@ int main() {
 	a.toomcook_mul(c);
 	cout << clock() - t << endl;
 	*/
-	a = a * a* a* a;
-	c = a.mul(c.mul(c));
-	cout << "Time of karac is ";
+	a = "987654321987654321098";
+	c = "1234567890123456789012";
+	cout << "Time of mul is " << endl;
 	auto t = clock();
+	cout << (a.mul(c)) << endl;
+	cout << clock() - t << endl;
+	cout << "Time of stras is " << endl;
+	t = clock();
+	cout << (a.strassen_mul(c)) << endl;
+	cout << clock() - t << endl;
+	cout << "Time of karac is " << endl;
+	t = clock();
 	cout << (a.karac_mul(c)) << endl;
-	cout << clock() - t << endl;	
-	cout << "Time of toom3 is ";
-	 t = clock();
+	cout << clock() - t << endl;
+	cout << "Time of toom3 is " << endl;
+	t = clock();
 	cout << (a.toomcook_mul(c)) << endl;
 	cout << clock() - t << endl;
+	t = clock();
+	cout << "SolovStras: " << endl;
+	cout << prtest_SolovStras(99194853094755497, 16) << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "Lehmann: " << endl;
+	cout << prtest_Lehmann(99194853094755497, 16) << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "RabinMiller: " << endl;
+	cout << prtest_RabinMiller(99194853094755497, 16) << endl;
+	cout << clock() - t << endl << endl;
+
     
     int l = 0;
     cin >> l;

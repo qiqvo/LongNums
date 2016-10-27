@@ -11,8 +11,8 @@ struct fft {
 
 Long Long::strassen_mul(const Long & b) const
 {
-	if (size() < 10 || b.size() < 10)
-		return operator*(b);
+	//if (size() < 10 || b.size() < 10)
+		//return operator*(b);
 	vector<ReIm> fa(a.begin(), a.end()), fb(b.a.begin(), b.a.end());
 	uint n = 1;
 	bool flag = (bool)(sign * b.sign);
@@ -26,7 +26,7 @@ Long Long::strassen_mul(const Long & b) const
 
 	std::thread da_tr(&fft::trans, da, std::ref(fa), false);
 	std::thread db_tr(&fft::trans, db, std::ref(fb), false);
-
+												
 	if (da_tr.joinable())
 		da_tr.join();
 	if (db_tr.joinable())
