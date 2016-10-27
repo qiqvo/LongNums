@@ -49,6 +49,7 @@ public:
 
 	Long changeSign(int b = 3);
 
+	const vector<ull>& container() const;
 	uint size() const;
 	ull operator[](int i) const;
 	void print(std::ostream & stream = std::cout) const;

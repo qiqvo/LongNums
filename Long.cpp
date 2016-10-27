@@ -70,6 +70,10 @@ void Long::clear()
 	a.clear();
 }
 
+const vector<ull>& Long::container() const {
+	return a;
+}
+
 uint Long::size() const
 {
 	return (uint)a.size();
