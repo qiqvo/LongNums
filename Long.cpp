@@ -124,6 +124,8 @@ Long Long::insert(vector<ull> x)
 
 Long Long::shift(uint n)
 {
+	if (n > 3)
+		return insert(vector<ull>(n, (ull)0));
 	while (n-- > 0) {
 		a.emplace(a.begin(), (ull)0);
 	}

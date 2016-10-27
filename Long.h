@@ -24,7 +24,7 @@ typedef std::complex<double> ReIm;
 typedef unsigned long long ull;
 
 class Long;
-class Real01;
+class Real;
 
 class Long
 {
@@ -39,8 +39,7 @@ protected:
 
 	void insert(ull v = 0);
 	Long insert(vector<ull>);
-	Long shift(uint n = 1);
-	Long normal();
+	virtual Long normal();
 
 	vector<ull> a;   // 2383597  --->   a == { 7 , 9 , 5 , 3 ... 2 }
 	static const ull karacnaive;
@@ -54,6 +53,7 @@ public:
 	ull operator[](int i) const;
 	void print(std::ostream & stream = std::cout) const;
 
+	Long shift(uint n = 1);
 	Long sum(const Long& b) const;
 	Long neg(const Long& b) const;
 	Long mul(const Long& b) const;
@@ -63,7 +63,7 @@ public:
 	Long toomcook_mul(const Long & b) const;
 	Long strassen_mul(const Long & b) const; // using 2 threads! 
 
-	Real01 inverse() const;
+	Real inverse() const;
 public:
 	Long(uint);
 	Long(int);
@@ -109,11 +109,6 @@ public:
 const auto null = Long(0);
 const auto pone = Long(1);
 const auto mone = Long(-1);
-
-// numbers from 0 to 1
-class Real01 : public Long {
-	const char* delim_mant = ".";
-};
 
 // even == chetnoe
 inline bool iseven(const Long & a) {
