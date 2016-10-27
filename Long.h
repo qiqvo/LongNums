@@ -22,11 +22,16 @@ typedef unsigned int uint;
 typedef unsigned short ush;
 typedef std::complex<double> ReIm;
 typedef unsigned long long ull;
-	
+
+class Long;
+class Real01;
+
 class Long
 {
 protected:
- bool sign;
+    bool sign;
+	const char* delim = ",";
+
     Long();
     void clear();
     Long set(ull v, bool s = true);
@@ -57,6 +62,8 @@ public:
 	Long karac_mul(const Long& b) const;
 	Long toomcook_mul(const Long & b) const;
 	Long strassen_mul(const Long & b) const; // using 2 threads! 
+
+	Real01 inverse() const;
 public:
 	Long(uint);
 	Long(int);
@@ -102,6 +109,11 @@ public:
 const auto null = Long(0);
 const auto pone = Long(1);
 const auto mone = Long(-1);
+
+// numbers from 0 to 1
+class Real01 : public Long {
+	const char* delim_mant = ".";
+};
 
 // even == chetnoe
 inline bool iseven(const Long & a) {
