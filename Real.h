@@ -2,13 +2,12 @@
 #include "Long.h"
 
 class Real : public Long{
-	Real();
+	vector<ull> part;
 	const char* delim_mant = ".";
 	uint mantisa_place;
+	Real normall();
 public:
-	Real(const Long& r);
-
-	static const uint eps;
+	Real(const Long& p1, const vector<ull>& p2); // p1.p2
 
 	Real operator+(const Real& o) const;
 	Real operator-(const Real& o) const;
