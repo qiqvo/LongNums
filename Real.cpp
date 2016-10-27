@@ -2,12 +2,39 @@
 #include "Real.h"
 
 const char* Real::delim_mant = ".";
+std::ostream & operator<<(std::ostream & stream, Real b) {
+	stream << b.operator std::string();
+	return stream;
+}
 Real::operator std::string() const {
-	std::string t = Long(*this);
-	int i = 0;
-	while (i != std::string::npos && i < mantisa_place) { ++i; }
-	t.insert(t.begin() + i, delim_mant[0]);
-	return t;
+	std::string s = "";
+	if (!sign) s += "-";
+
+	int i = size() - 1, j = real_size();
+	int q = mantisa_place;
+	if (q > j) {
+		--q;
+		s += "0" + std::string(delim_mant);
+		while (q-- > j)
+			s += "0";
+		while (i >= 0) 
+			s += my_to_string(a[i--], base);
+	}
+	else {
+		s += std::to_string(a[i--]);
+		while (i >= 0) {
+			if (j > mantisa_place)
+				for (auto tmp = 0; tmp < std::log10(base); ++tmp) {
+					if (j - tmp == mantisa_place)
+						s += std::string(delim_mant);
+				}
+			else 
+				j -= std::log10(base);
+
+			s += my_to_string(a[i--], base);
+		}
+	}
+	return s;
 }
 Real Real::normalmant()
 {
@@ -124,4 +151,22 @@ Real & Real::operator=(Real && o) {
 	mantisa_place = o.mantisa_place;
 	o.clear();
 	return *this;
+}
+Long to_Long(const Real & a)
+{
+	vector<ull> c;
+	auto i = 0, j = 0, q = 1;
+	int bs = std::log10(Long::base);
+ 
+	while (j < a.size()) {
+		auto cou = 0;
+		ull tmp = 0;
+		while (cou <= bs && i != a.get_mant()) {
+			tmp += a.get_char(i++) * q;
+			q *= 10;
+		}
+		c.push_back(tmp);
+		++j;
+	}
+	return Long(c);
 }

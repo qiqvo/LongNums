@@ -1,9 +1,10 @@
 #include "Long.h"
 #include "Real.h"
 
-const uint eps = 9;
+const uint eps = 8;
 
 Real Long::inverse() const {
+	int bs = std::log10(base);
 	auto v = vector<ull>(size(), (ull)0);
 	v.emplace(v.begin(), (ull)1);
 	Real approx(Long(v), v.size());

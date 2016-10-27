@@ -54,6 +54,7 @@ public:
 	uint real_size() const;
 
 	ull operator[](int i) const;
+	ull get_char(uint i) const;
 	void print(std::ostream & stream = std::cout) const;
 
 	Long shift(uint n = 1);
@@ -125,7 +126,6 @@ inline bool iseven(const Long & a) {
 inline bool isodd(const Long & a) {
     return (a[0] & 1);
 }
-
 std::ostream & operator<<(std::ostream & stream, Long b);
 
 Long rand(const uint s);
@@ -146,3 +146,4 @@ double prtest_RabinMiller(const Long & p, ull iter);
 Long Jacobi(Long& a, Long& b);
 
 std::string my_to_string(const ull& a, const int base);
+Long to_Long(const Real& a);

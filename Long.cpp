@@ -5,12 +5,10 @@
 //#include <future>
 //#include <stdexcept>   // for logic error
 
-std::ostream & operator<<(std::ostream & stream, Long b)
-{
+std::ostream & operator<<(std::ostream & stream, Long b) {
 	stream << b.operator std::string();
 	return stream;
 }
-
 inline std::string my_to_string(const ull& a, const int base)
 {
 	std::string s = "";
@@ -90,6 +88,21 @@ ull Long::operator[](int i) const
 {
 	if (i >= size()) return 0;
 	return a[i];
+}
+ull Long::get_char(uint i) const{
+	auto f = [](ull num, int i) -> int {
+		auto j = 0;
+		while(num != 0) {
+			++j;
+			if (j == i) {
+				return num % 10;
+			}
+			num = num / 10;
+		}
+		return -1;
+	};
+	int bs = std::log10(base);
+	return f(a[i / bs], i = i%bs);
 }
 void Long::print(std::ostream & stream) const
 {

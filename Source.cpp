@@ -152,7 +152,7 @@ int main() {
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "inverse * b: " << a << "**-1 * " << b << endl;
-	cout << Long(b * a.inverse()) << endl;
+	cout << to_Long(a.inverse() * b) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "a / b: " << a << " / " << b << endl;
