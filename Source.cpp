@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include "Long.h"
+#include "Real.h"
 #include <ctime>
 
 #include <thread>
@@ -113,6 +114,7 @@ int main() {
 	c = "1234567890123456789012";
 	cout << "Time of mul is " << endl;
 	auto t = clock();
+	/*
 	cout << (a.mul(c)) << endl;
 	cout << clock() - t << endl;
 	cout << "Time of stras is " << endl;
@@ -129,17 +131,33 @@ int main() {
 	cout << clock() - t << endl;
 	t = clock();
 	cout << "SolovStras: " << endl;
-	cout << prtest_SolovStras(99194853094755497, 16) << endl;
+	cout << prtest_SolovStras(9919755497, 16) << endl;//99194853094755497
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "Lehmann: " << endl;
-	cout << prtest_Lehmann(99194853094755497, 16) << endl;
+	cout << prtest_Lehmann(991497, 16) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "RabinMiller: " << endl;
-	cout << prtest_RabinMiller(99194853094755497, 16) << endl;
+	cout << prtest_RabinMiller(755497, 16) << endl;
 	cout << clock() - t << endl << endl;
-
+	*/
+	t = clock();
+	cout << "inverse to : " << 8 << endl;
+	cout << Long(8).inverse() << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "inverse to : " << a << endl;
+	cout << a.inverse() << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "inverse * b: " << a << "**-1 * " << b << endl;
+	cout << Long(b * a.inverse()) << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "a / b: " << a << " / " << b << endl;
+	cout << a / b << endl;
+	cout << clock() - t << endl << endl;
     
     int l = 0;
     cin >> l;

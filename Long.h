@@ -32,7 +32,7 @@ protected:
     bool sign;
 	const char* delim = ",";
 
-    Long();
+	Long();
     void clear();
     Long set(ull v, bool s = true);
     ull set(uint i, ull v); // dangerous ! use normal after!
@@ -57,6 +57,8 @@ public:
 	void print(std::ostream & stream = std::cout) const;
 
 	Long shift(uint n = 1);
+	Long shiftaccurate(uint n = 1);
+	Long shiftback(uint n = 1);
 	Long sum(const Long& b) const;
 	Long neg(const Long& b) const;
 	Long mul(const Long& b) const;
@@ -106,7 +108,9 @@ public:
 	bool operator==(const Long& o) const;
 	bool operator!=(const Long& o) const;
 
-	operator std::string() const;
+	virtual operator std::string() const;
+
+	~Long();
 };
 
 const auto null = Long(0);

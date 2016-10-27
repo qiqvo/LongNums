@@ -36,6 +36,11 @@ const ull Long::toom3naive = 5;
 
 Long::Long() : sign(true) {}
 
+Long::~Long()
+{
+	clear();
+}
+
 Long::Long(const Long & o)
 {
 	operator=(o);
@@ -79,11 +84,8 @@ uint Long::size() const
 	return (uint)a.size();
 }
 uint Long::real_size() const{
-	uint s = a.size();
-	uint b = base;
-	ull last_n = a.back();
-	return (s - 1)*std::log10(b) + std::log10(last_n);
-};
+	return (a.size() - 1)*std::log10(base) + std::log10(a.back());
+}
 ull Long::operator[](int i) const
 {
 	if (i >= size()) return 0;
@@ -140,6 +142,28 @@ Long Long::shift(uint n)
 		a.emplace(a.begin(), (ull)0);
 	}
 	return *this;
+}
+Long Long::shiftaccurate(uint n)
+{
+	int bs = std::log10(base);
+	while (n > bs) {
+		shift(1); n -= bs;
+	}
+	while (n != 0) {
+		a[0] *= 10;
+		--n;
+	}
+	return normal();
+}
+Long Long::shiftback(uint n)
+{
+	int bs = std::log10(base);
+	while (n > bs) {
+		shift(1); n -= bs;
+	}
+	a.emplace(a.begin(), (ull)0);
+
+	return normal();
 }
 Long Long::changeSign(int b)
 {
