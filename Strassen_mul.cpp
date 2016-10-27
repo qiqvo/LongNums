@@ -1,6 +1,6 @@
 #include "Long.h"
 #include <thread>
-using namespace LONGNUM;
+
 vector<int> rev;
 
 struct fft {
@@ -24,8 +24,8 @@ Long Long::strassen_mul(const Long & b) const
 	fft da, db, dc;
 	fft::calc_rev(n);
 
-	std::thread da_tr(&fft::trans, da, fa, false);
-	std::thread db_tr(&fft::trans, db, fb, false);
+	std::thread da_tr(&fft::trans, da, std::ref(fa), false);
+	std::thread db_tr(&fft::trans, db, std::ref(fb), false);
 
 	if (da_tr.joinable())
 		da_tr.join();

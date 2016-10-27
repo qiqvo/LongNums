@@ -1,5 +1,6 @@
 ﻿#include "Long.h"
-using namespace LONGNUM;
+ 
+ 
 
 Long Long::toomcook_mul(const Long & b) const
 {
@@ -9,45 +10,31 @@ Long Long::toomcook_mul(const Long & b) const
 	const int k = 3;
 	const int k2 = 5;
 
-	auto ko = size();
-	auto k_big = 0;
-	Long big_part = null;
-
-	if (size() > b.size()) {
-		k_big = b.size();
-		big_part = Long(vector<ull>({ a.begin() + k_big, a.end() }));
-		int t = big_part.size();
-		if (t <= k_big) {
-			big_part = (big_part.insert(vector<ull>(k_big - t, 0)).toomcook_mul(b)).insert(vector<ull>(t, 0));
-		}
-		else {
-			big_part = (big_part.toomcook_mul(b)).insert(vector<ull>(k_big, 0));
-		}
-		ko = k_big / 3;
-	}
-	else if (size() == b.size())
-		ko = size() / 3;
-	else
-		return b.toomcook_mul(*this);
-
-	if (ko == 0)
-		return mul(b);
+	auto km = std::max(size(), b.size());
 
 	bool fl = (bool)(sign * b.sign);
 
-	Long U[k], V[k];
+	Long U[k];
+    Long V[k];
 
-	U[0] = Long(vector<ull>({ a.begin(), a.begin() + ko }));
-	U[1] = Long(vector<ull>({ a.begin() + ko, a.begin() + ko + ko }));
-	if (k_big == 0)
-		U[2] = Long(vector<ull>({ a.begin() + ko + ko, a.end() }));
-	else
-		U[2] = Long(vector<ull>({ a.begin() + ko + ko, a.begin() + ko + ko + ko }));
-
-	V[0] = Long(vector<ull>({ b.a.begin() , b.a.begin() + ko }));
-	V[1] = Long(vector<ull>({ b.a.begin() + ko , b.a.begin() + ko + ko }));
-	V[2] = Long(vector<ull>({ b.a.begin() + ko + ko , b.a.end() }));
-
+	auto f = [km](Long& wh, const Long& what, int mode) {
+		if (mode == 1)
+		    mode = km;
+		if( mode == 2)
+		    mode = km + km;
+		for (uint i = mode; i < km + mode; ++i) {
+			wh.a[i] = what[i];
+		}
+	};
+	for (auto i = 0; i < k; ++i){
+		U[i] = Long(vector<ull>(km, (ull)0));
+		f(U[i], *this, i);
+	}
+	for (auto i = 0; i < k; ++i){
+		V[i] = Long(vector<ull>(km, (ull)0));
+		f(V[i], b, i);
+	}
+	
 	/*
 	p0  =   m0 + m2
 	p(0)   =  m0
@@ -58,7 +45,7 @@ Long Long::toomcook_mul(const Long & b) const
 	*/
 	Long P[k2 + 1], Q[k2 + 1]; // values of two polynoms in 5 points
 
-	auto f = [](Long a[], Long b[]) {
+	auto g = [](Long a[], Long b[]) {
 		a[0] = b[0] + b[2];
 		a[1] = b[0];					 // 0
 		a[2] = a[0] + b[1];				 // 1 
@@ -67,8 +54,8 @@ Long Long::toomcook_mul(const Long & b) const
 		a[5] = b[2];                     // inf
 	};
 
-	 //f(P, U);
-	f(Q, V);
+    g(P, U);
+	g(Q, V);
 
 	Long R[k2]; // values of resulting polynom in 5 points
 
@@ -89,7 +76,7 @@ Long Long::toomcook_mul(const Long & b) const
 	Res[2] = Res[2] + Res[1] - Res[4];
 	Res[1] = Res[1] - Res[3];
 
-	return ((Res[4].insert(vector<ull>(ko + ko, 0)) + Res[2]).insert(vector<ull>(ko + ko, 0)) + Res[0]
-		+ Res[1].insert(vector<ull>(ko, 0)) + Res[3].insert(vector<ull>(ko + ko + ko, 0)) + big_part).changeSign(fl);
+	return ((Res[4].insert(vector<ull>(km + km, 0)) + Res[2]).insert(vector<ull>(km + km, 0)) + Res[0]
+		+ Res[1].insert(vector<ull>(km, 0)) + Res[3].insert(vector<ull>(km + km + km, 0))).changeSign(fl);
 }
 

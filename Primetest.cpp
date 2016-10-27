@@ -1,6 +1,5 @@
 #include "Long.h"
-#include <thread>
-namespace LONGNUM {
+
 	struct PrimeTest {
 		static double not_prime;
 		static double SolovStras_met(Long & a, const Long & p);
@@ -95,9 +94,11 @@ namespace LONGNUM {
 			else if (z != p - 1)
 				return not_prime = -1;
 		} while (j != b);
+
+		return not_prime *= 0.5;
 	}
 
-	double prtest_general(const Long & p, ull iter, double(*_met)(Long & a, const Long & p)) {
+	double prtest_general(const Long & p, ull iter, double (*_met)(Long& a, const Long& p)) {
 		ull l = 0;
 		Long a[4] = { pone, pone, pone, pone };
 		PrimeTest::not_prime = 1.;
@@ -105,17 +106,16 @@ namespace LONGNUM {
 		while (PrimeTest::not_prime > 0. && l++ < iter) {
 			for (auto& i : a)
 				i = rand(p.size(), p,
-					[](auto& a, auto& p)
+					[](const auto& a, const auto& p)
 			{return a < p && a != null;}
 			);
-
 			std::thread testthr[4] = {
-				std::thread(_met, (a[0]), p),
-				std::thread(_met, (a[1]), p),
-				std::thread(_met, (a[2]), p),
-				std::thread(_met, (a[3]), p)
-			};
-
+				{ _met, std::ref(a[0]), (p) },
+				{ _met, std::ref(a[1]), (p) },
+				{ _met, std::ref(a[2]), (p) },
+				{ _met, std::ref(a[3]), (p) },
+			};    
+            
 			for (auto& th : testthr) {
 				if (th.joinable())
 					th.join();
@@ -136,7 +136,7 @@ namespace LONGNUM {
 	double prtest_RabinMiller(const Long & p, ull iter)
 	{
 		// b == how many times 2 divides p - 1 
-		Rab_MilTest::b = pow(Long(2), [](auto& p) -> Long {
+		Rab_MilTest::b = pow(Long(2), [](const Long& p) -> Long {
 			Long counter = null;
 			for (uint i = 0; i < p.size(); ++i) {
 				auto t = p[i];
@@ -151,5 +151,3 @@ namespace LONGNUM {
 		Rab_MilTest::m = (p - 1) / Rab_MilTest::b;
 		return prtest_general(p, iter, &(Rab_MilTest::RabinMiller_met));
 	}
-
-};

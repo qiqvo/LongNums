@@ -1,5 +1,4 @@
-#include "Long.h"
-using namespace LONGNUM;
+#include "Long.h" 
 
 bool Long::operator==(const Long & o) const
 {

@@ -1,6 +1,6 @@
 #include "Long.h"
-using namespace LONGNUM;
-
+ 
+ 
 
 
 Long Long::karac_mul(const Long & b) const

@@ -4,16 +4,14 @@
 //#include <thread>
 //#include <future>
 //#include <stdexcept>   // for logic error
-using namespace LONGNUM;
 
-std::ostream & LONGNUM::operator<<(std::ostream & stream, Long b)
+std::ostream & operator<<(std::ostream & stream, Long b)
 {
 	stream << b.operator std::string();
 	return stream;
 }
 
-template<typename T>
-inline std::string LONGNUM::to_string(const T & a, const T& base)
+inline std::string my_to_string(const ull& a, const int base)
 {
 	std::string s = "";
 	auto b = base; auto sz = 0;
@@ -101,7 +99,7 @@ Long::operator std::string() const
 	int i = size() - 1;
 	s += std::to_string(a[i--]);
 	while (i >= 0) {
-		s += to_string<ull>(a[i--], base);
+		s += my_to_string(a[i--], base);
 	}
 	return s;
 }

@@ -1,5 +1,6 @@
 #include "Long.h"
-using namespace LONGNUM;
+ 
+ 
 
 ull binsearch(const Long& a, const Long& b, Long& pr, ull l, ull r);
 

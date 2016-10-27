@@ -1,5 +1,6 @@
 #include "Long.h"
-using namespace LONGNUM;
+ 
+ 
 
 Long Long::sum(const Long& b) const
 {
