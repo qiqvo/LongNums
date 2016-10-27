@@ -51,6 +51,8 @@ public:
 
 	const vector<ull>& container() const;
 	uint size() const;
+	uint real_size() const;
+
 	ull operator[](int i) const;
 	void print(std::ostream & stream = std::cout) const;
 
@@ -90,9 +92,9 @@ public:
 	Long& operator=(const Long& o);
 	Long& operator=(Long&& o);
 
-	Long operator+(const Long& o) const;
-	Long operator-(const Long& o) const;
-	Long operator*(const Long& o) const;
+	virtual Long operator+(const Long& o) const;
+	virtual Long operator-(const Long& o) const;
+	virtual Long operator*(const Long& o) const;
 	Long operator/(const int o)   const;
 	Long operator/(const Long& o) const;
 	Long operator%(const Long& o) const;

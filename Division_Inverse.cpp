@@ -1,15 +1,16 @@
 #include "Long.h"
+#include "Real.h"
 
-struct Real {
-	Long a;
-	static const uint eps;
-	uint mantisa_place;
-};
+const uint eps = 90;
 
-const uint Real::eps = 90;
 Real Long::inverse() const {
-	Real aprrox{ 1, 1 };
-	for (uint i = 0; i < Real::eps; ++i) {
-		approx = aprrox * (Long(2).insert() - (*this) * aprrox);
+	auto v = vector<ull>(size(), (ull)0);
+	v.emplace(v.begin(), (ull)1);
+	Real approx(Long(v), size());
+	const Real two = Real(Long(2), 0);
+	const Real th = Real(*this, 0);
+	for (uint i = 0; i < eps; ++i) {
+		approx = approx * (two - approx * th);
 	}
+	return approx;
 }

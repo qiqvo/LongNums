@@ -78,6 +78,12 @@ uint Long::size() const
 {
 	return (uint)a.size();
 }
+uint Long::real_size() const{
+	uint s = a.size();
+	uint b = base;
+	ull last_n = a.back();
+	return (s - 1)*std::log10(b) + std::log10(last_n);
+};
 ull Long::operator[](int i) const
 {
 	if (i >= size()) return 0;
