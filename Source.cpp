@@ -129,26 +129,28 @@ int main() {
 	t = clock();
 	cout << (a.toomcook_mul(c)) << endl;
 	cout << clock() - t << endl;
+	
 	t = clock();
 	cout << "SolovStras: " << endl;
-	cout << prtest_SolovStras(9919755497, 16) << endl;//99194853094755497
+	cout << prtest_SolovStras(99194853094755497, 16) << endl;//99194853094755497
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "Lehmann: " << endl;
-	cout << prtest_Lehmann(991497, 16) << endl;
+	cout << prtest_Lehmann(99194853094755497, 16) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "RabinMiller: " << endl;
-	cout << prtest_RabinMiller(755497, 16) << endl;
+	cout << prtest_RabinMiller(99194853094755497, 16) << endl;
 	cout << clock() - t << endl << endl;
 	*/
+
 	t = clock();
 	cout << "inverse to : " << 8 << endl;
 	cout << Long(8).inverse() << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
-	cout << "inverse to : " << a << endl;
-	cout << a.inverse() << endl;
+	cout << "inverse to : " << 25467859 << endl;
+	cout << Long("25467859").inverse() << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
 	cout << "inverse * b: " << a << "**-1 * " << b << endl;

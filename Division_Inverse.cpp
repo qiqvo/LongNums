@@ -7,7 +7,7 @@ Real Long::inverse() const {
 	int bs = std::log10(base);
 	auto v = vector<ull>(size(), (ull)0);
 	v.emplace(v.begin(), (ull)1);
-	Real approx(Long(v), v.size());
+	Real approx(Long(v), real_size() + 1);
 	const Real two = Real(Long(2), 0);
 	const Real th = Real(*this, 0);
 	for (uint i = 0; i < eps; ++i) { 

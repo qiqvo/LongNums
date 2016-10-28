@@ -82,7 +82,9 @@ uint Long::size() const
 	return (uint)a.size();
 }
 uint Long::real_size() const{
-	return (a.size() - 1)*std::log10(base) + std::log10(a.back());
+	int t = std::log10(a.back());
+	int bs = std::log10(base);
+	return (a.size())*std::log10(base) - (bs - ((a.back() != 0) ? t + 1 : 0));
 }
 ull Long::operator[](int i) const
 {

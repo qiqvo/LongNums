@@ -7,6 +7,7 @@ class Real : public Long{
 	Real normalmant();
 	Real cutlastnulls();
 public:
+	uint set_mant(uint mant) { mantisa_place = mant; }
 	const uint get_mant() const { return mantisa_place; }
 	Real(const Long& p1, uint m = 0); // p1.p2
 	

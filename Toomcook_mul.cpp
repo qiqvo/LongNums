@@ -1,8 +1,6 @@
 ﻿#include "Long.h"
  
- 
-
-Long Long::toomcook_mul(const Long & b) const
+ Long Long::toomcook_mul(const Long & b) const
 {
 	if (size() < toom3naive && b.size() < toom3naive)
 		return mul(b);

@@ -51,7 +51,7 @@ Real Real::normalmant()
 				at *= 10;
 				++tmp;
 			}
-			if (at > base)
+			if (tmp > 0 && at >= base)
 				at /= 10;
 			a[j] = at;
 		}
@@ -110,7 +110,7 @@ Real Real::operator-(const Real & o) const {
 	int shifting = (m1 - m2 + t10);
 	p1 = mmant ? (p1 - p2.shiftback(shifting)) : (p2.shiftback(shifting) - p1);
 	Real p3 = static_cast<Real>(p1);
-	p3.mantisa_place = m1;
+	p3.mantisa_place = m1;       // x(n+1) = xn(2 - b * xn)
 	return p3.cutlastnulls();
 }
 Real Real::operator*(const Real & o) const{
