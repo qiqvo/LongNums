@@ -56,11 +56,13 @@ Real Real::normalmant()
 	return *this;
 }
 
-Real Real::cut()
+Real Real::cut(uint t)
 {
-	if (size() >= 16) {
-		a.erase(a.begin(), a.end() - 16);
+	if (size() >= t) {
+		mantisa_place -= (size() - t) * bs;
+		a.erase(a.begin(), a.end() - t);
 	}
+	return *this;
 }
 
 Real::Real(const Long & p1, uint m) : Long(p1), mantisa_place(m) {
@@ -141,16 +143,15 @@ Real & Real::operator=(Real && o) {
 Long to_Long(const Real & a)
 {
 	vector<ull> c;
-	auto i = 0, j = 0, q = 1;
-	while (j < a.size()) {
-		auto cou = 0;
-		ull tmp = 0;
-		while (cou <= Long::bs && i != a.get_mant()) {
-			tmp += a.get_char(i++) * q;
-			q *= 10;
-		}
-		c.push_back(tmp);
-		++j;
+	int i = a.real_size(), j = a.get_mant(), k = a.size() - 1;
+	int tmp = 0;
+	while (k > 0 && i > j) {
+		c.push_back(a[k]);
+		i -= (a[k] == 0) ? std::log10(a[k]) + 1 : Long::bs;
+		--k;
 	}
-	return Long(c);
+	for (int d = 0; d < c.size() / 2; ++d) 
+		std::swap(c[d], c[c.size() - d - 1]);
+
+	return Long(c);// / std::pow(10, j - i - tmp);
 }

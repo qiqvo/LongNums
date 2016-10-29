@@ -7,9 +7,13 @@ Real inverse(const Long& a, uint iterations) {
 	const Real two = Real(Long(2), 0);
 	const Real th = Real(a, 0);
 	//std::cout << -1 << "   " << approx << std::endl;
-	for (uint i = 0; i < iterations; ++i) {
+	for (uint i = 0, count = 0; i < iterations; ++i, ++count) {
 		approx = approx * (two - approx * th);
+		if (count == 6) {
+			count = 0;
+			approx.cut(rs);
+		}
 	//	std::cout << i << "   " << approx << std::endl;
 	}
-	return approx;
+	return approx.cut();
 }

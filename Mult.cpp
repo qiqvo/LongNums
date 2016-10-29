@@ -25,7 +25,7 @@ Long Long::divide(const int b, Long& rem) const
 		throw "Division by zero!";
 
 	auto t = b;
-	ull c = 0; 
+	ull c = 0;
 	int fl = (sign);
 	if (b < 0) {
 		fl = (fl * 0);

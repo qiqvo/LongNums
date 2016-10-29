@@ -132,7 +132,7 @@ Long rand(const uint s);
 Long rand(const uint s, const Long &c,
     bool(*condition)(const Long& a, const Long& b) = [](auto& a, auto& b) { return true; });
 
-Real inverse(const Long& a, uint iterations = 9);
+Real inverse(const Long& a, uint iterations = 15);
 Long abs(const Long& a);
 Long factorial(const Long& n);
 Long gcd(const Long& u, const Long& v);

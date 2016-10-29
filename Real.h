@@ -8,7 +8,7 @@ class Real : public Long{
 
 public:
 	// 0.000000000005151510000000021540000000058887 -> 0.00000000000515151
-	Real cut();
+	Real cut(uint t = 16);
 	uint set_mant(uint mant) { mantisa_place = mant; }
 	const uint get_mant() const { return mantisa_place; }
 	Real(const Long& p1, uint m = 0); // if you want 0.1: p1 = 1000, m = 1
