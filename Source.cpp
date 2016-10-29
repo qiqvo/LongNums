@@ -146,19 +146,23 @@ int main() {
 
 	t = clock();
 	cout << "inverse to : " << 8 << endl;
-	cout << Long(8).inverse() << endl;
+	cout << inverse(Long(8)) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
-	cout << "inverse to : " << 25467859 << endl;
-	cout << Long("25467859").inverse() << endl;
+	cout << "inverse to : " << n << endl;
+	cout << inverse(n) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
-	cout << "inverse * b: " << a << "**-1 * " << b << endl;
-	cout << to_Long(a.inverse() * b) << endl;
+	cout << "inverse to : " << 515188 << endl;
+	cout << inverse(Long(515188)) << endl;
 	cout << clock() - t << endl << endl;
 	t = clock();
-	cout << "a / b: " << a << " / " << b << endl;
-	cout << a / b << endl;
+	cout << "inverse * b: " << 515188 << "**-1 * " << 56584920194 << endl;
+	cout << to_Long(inverse(Long(515188)) * Long(56584920194)) << endl;
+	cout << clock() - t << endl << endl;
+	t = clock();
+	cout << "a / b: " << 25467859 << " / " << n << endl;
+	cout << Long(56584920194) / 515188 << endl;
 	cout << clock() - t << endl << endl;
     
     int l = 0;

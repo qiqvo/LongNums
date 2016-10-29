@@ -30,7 +30,7 @@ class Long
 {
 protected:
     bool sign;
-	const char* delim = ",";
+	static const char* delim;
 
 	Long();
     void clear();
@@ -46,6 +46,7 @@ protected:
 	static const ull toom3naive;
 public:
 	static const ull base;
+	static const uint bs; 
 
 	Long changeSign(int b = 3);
 
@@ -68,8 +69,7 @@ public:
 	Long karac_mul(const Long& b) const;
 	Long toomcook_mul(const Long & b) const;
 	Long strassen_mul(const Long & b) const; // using 2 threads! 
-
-	Real inverse() const;
+	
 public:
 	Long(uint);
 	Long(int);
@@ -132,13 +132,13 @@ Long rand(const uint s);
 Long rand(const uint s, const Long &c,
     bool(*condition)(const Long& a, const Long& b) = [](auto& a, auto& b) { return true; });
 
+Real inverse(const Long& a, uint iterations = 9);
 Long abs(const Long& a);
 Long factorial(const Long& n);
 Long gcd(const Long& u, const Long& v);
 Long pow(const Long& u, const Long& v);
 Long pow_mod(const Long& a, const Long& pow, const Long& N);
 
-/* using 4 threads */
 double prtest_SolovStras(const Long & p, ull iter);
 double prtest_Lehmann(const Long & p, ull iter);
 double prtest_RabinMiller(const Long & p, ull iter);

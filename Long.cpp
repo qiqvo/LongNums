@@ -29,8 +29,10 @@ inline std::string my_to_string(const ull& a, const int base)
 }
 
 const ull Long::base = 10000;
+const uint Long::bs = std::log10(Long::base);
 const ull Long::karacnaive = 5;
 const ull Long::toom3naive = 5;
+const char* Long::delim = ",";
 
 Long::Long() : sign(true) {}
 
@@ -83,8 +85,7 @@ uint Long::size() const
 }
 uint Long::real_size() const{
 	int t = std::log10(a.back());
-	int bs = std::log10(base);
-	return (a.size())*std::log10(base) - (bs - ((a.back() != 0) ? t + 1 : 0));
+	return (uint)(a.size())*bs - (bs - ((a.back() != 0) ? t + 1 : 0));
 }
 ull Long::operator[](int i) const
 {
@@ -103,7 +104,6 @@ ull Long::get_char(uint i) const{
 		}
 		return -1;
 	};
-	int bs = std::log10(base);
 	return f(a[i / bs], i = i%bs);
 }
 void Long::print(std::ostream & stream) const
@@ -160,7 +160,6 @@ Long Long::shift(uint n)
 }
 Long Long::shiftaccurate(uint n)
 {
-	int bs = std::log10(base);
 	while (n > bs) {
 		shift(1); n -= bs;
 	}
@@ -172,7 +171,6 @@ Long Long::shiftaccurate(uint n)
 }
 Long Long::shiftback(uint n)
 {
-	int bs = std::log10(base);
 	while (n > bs) {
 		shift(1); n -= bs;
 	}

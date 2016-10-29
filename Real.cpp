@@ -12,7 +12,7 @@ Real::operator std::string() const {
 
 	int i = size() - 1, j = real_size();
 	int q = mantisa_place;
-	if (q > j) {
+	if (q >= j) {
 		--q;
 		s += "0" + std::string(delim_mant);
 		while (q-- > j)
@@ -24,12 +24,12 @@ Real::operator std::string() const {
 		s += std::to_string(a[i--]);
 		while (i >= 0) {
 			if (j > mantisa_place)
-				for (auto tmp = 0; tmp < std::log10(base); ++tmp) {
+				for (auto tmp = 0; tmp < bs; ++tmp) {
 					if (j - tmp == mantisa_place)
 						s += std::string(delim_mant);
 				}
 			else 
-				j -= std::log10(base);
+				j -= bs;
 
 			s += my_to_string(a[i--], base);
 		}
@@ -41,44 +41,30 @@ Real Real::normalmant()
 	if (mantisa_place == 0)
 		return *this;
 	int bs = std::log10(base);
-	for (int i = 0, j = 0; i < mantisa_place && j < size(); ++j){	
-		if (i > mantisa_place)
-			break;
-		if (uint(std::log10(a[j])) < base - 1) {
-			auto tmp = 0;
-			auto at = a[j];
-			while (at < base && i + tmp < mantisa_place) {
-				at *= 10;
-				++tmp;
-			}
-			if (tmp > 0 && at >= base)
-				at /= 10;
-			a[j] = at;
-		}
-		i += bs;
+	vector<ull> vec;
+	int j = 0;
+	if (a[0] == 0) {
+		do {
+			++j;
+		} while (j < size() && a[j] == 0); 
+		while (j < size())
+			vec.push_back(a[j++]);
+		a = vec;
+		return normalmant();
 	}
 
 	return *this;
 }
-Real Real::cutlastnulls()
+
+Real Real::cut()
 {
-	vector<ull> vec;
-	int bs = std::log10(base);
-	int i = 0, j = 0;
-	while (i < mantisa_place) {
-		if (a[j] != 0) {
-			break;
-		}
-		++j;
-		i += bs;
+	if (size() >= 16) {
+		a.erase(a.begin(), a.end() - 16);
 	}
-	while(j < size())			
-		vec.push_back(a[j++]);
-	a = vec;
-	return *this;
 }
+
 Real::Real(const Long & p1, uint m) : Long(p1), mantisa_place(m) {
-	normalmant(); cutlastnulls();
+	normalmant();
 }
 
 Real Real::operator+(const Real & o) const
@@ -92,7 +78,7 @@ Real Real::operator+(const Real & o) const
 	p1 = p1 + p2.shift(m1 - m2);
 	Real p3 = static_cast<Real>(p1);
 	p3.mantisa_place = m1;
-	return p3.cutlastnulls();
+	return p3.normalmant();
 }
 Real Real::operator-(const Real & o) const {
 	bool mmant = mantisa_place > o.mantisa_place;
@@ -111,13 +97,13 @@ Real Real::operator-(const Real & o) const {
 	p1 = mmant ? (p1 - p2.shiftback(shifting)) : (p2.shiftback(shifting) - p1);
 	Real p3 = static_cast<Real>(p1);
 	p3.mantisa_place = m1;       // x(n+1) = xn(2 - b * xn)
-	return p3.cutlastnulls();
+	return p3.normalmant();
 }
-Real Real::operator*(const Real & o) const{
+Real Real::operator*(const Real & o) const {
 	Long p1 = Long(*this) * Long(o);
 	Real p2 = static_cast<Real>(p1);
 	p2.mantisa_place = mantisa_place + o.mantisa_place;
-	return p2.cutlastnulls();
+	return p2.normalmant();
 }
 
 Real::Real(const Real & o) : Long(o)
@@ -156,12 +142,10 @@ Long to_Long(const Real & a)
 {
 	vector<ull> c;
 	auto i = 0, j = 0, q = 1;
-	int bs = std::log10(Long::base);
- 
 	while (j < a.size()) {
 		auto cou = 0;
 		ull tmp = 0;
-		while (cou <= bs && i != a.get_mant()) {
+		while (cou <= Long::bs && i != a.get_mant()) {
 			tmp += a.get_char(i++) * q;
 			q *= 10;
 		}

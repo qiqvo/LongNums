@@ -1,6 +1,4 @@
 #include "Long.h"
- 
- 
 
 Long Long::operator+(const Long & o) const
 {
