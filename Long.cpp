@@ -53,18 +53,14 @@ Long::Long(Long && o)
 Long & Long::operator=(const Long & o)
 {
 	clear();
-	for (auto i : o.a) {
-		(*this).a.push_back(i);
-	}
+	a = o.a;
 	sign = o.sign;
 	return *this;
 }
 Long & Long::operator=(Long && o)
 {
 	clear();
-	for (auto i : o.a) {
-		a.push_back(i);
-	}
+	a = o.a;
 	sign = o.sign;
 	o.clear();
 	return *this;
