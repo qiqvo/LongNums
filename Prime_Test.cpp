@@ -103,36 +103,43 @@ double Rab_MilTest::RabinMiller_met(Long & a, const Long & p) {
 
 double prtest_general(const Long & p, ull iter, double (*_met)(Long& a, const Long& p)) {
 	ull l = 0;
-	//Long a[] = { pone , pone }; // , pone, pone};
-	Long a = pone;
+	Long a[] = { pone , pone , pone, pone };
+	Long pm[] = { p , p , p, p};
+	// Long a = pone;
 	PrimeTest::not_prime = 1.;
-	iter = iter;
-	//std::thread thr1, thr2; //, thr3, thr4;
+	iter = iter / 4;
+	std::thread thr1, thr2, thr3;
 	while (PrimeTest::not_prime > 0. && l++ < iter) {
-		//for (auto& i : a)
-		//	i = rand(p.size(), p,
-		//		[](const auto& a, const auto& p)
-		//{return a < p && a != null;}
-		//);
-		a = rand(p.size(), p,
-			[](const auto& a, const auto& p)
-		{return a < p && a != null;}
-		);
+		for (auto& i : a) {
+			i = rand(p.size(), p,
+				[](const auto& a, const auto& p)
+			{return a < p && a != null;}
+			);
+		}
+		// a = rand(p.size(), p,
+		// 	[](const auto& a, const auto& p)
+		// {return a < p && a != null;}
+		// );
 
-		_met(a, (p));
-		//thr1 = std::thread(_met, a[0], (p));
-		//thr2 = std::thread(_met, a[1], (p));
-		//thr3 = std::thread(_met, a[2], (p));
-		//thr4 = std::thread(_met, a[3], (p));      
-		//
-		//if (thr1.joinable())
-		//	thr1.join();
-		//if (thr2.joinable())
-			//thr2.join();
-		//if (thr3.joinable())
-		//	thr3.join();
-		//if (thr4.joinable())
-		//	thr4.join();
+		//_met(a[], (p));
+		// _met(a[0], (pm[0]));
+	    // _met(a[1], (pm[1]));
+	    // _met(a[2], (pm[2]));
+	    // _met(a[3], (pm[3]));
+		thr1 = std::thread(_met, a[0], (pm[0]));
+		thr2 = std::thread(_met, a[1], (pm[1]));
+		thr3 = std::thread(_met, a[2], (pm[2]));
+		//thr4 = std::thread(_met, a[3], (pm[3]));   
+		_met(a[3], (pm[3]));
+		 
+		if (thr1.joinable())
+			thr1.join();
+		if (thr2.joinable())
+		    thr2.join();
+		if (thr3.joinable())
+			thr3.join();
+		// if (thr4.joinable())
+		//  	thr4.join();
 	}
 
 	return PrimeTest::not_prime;

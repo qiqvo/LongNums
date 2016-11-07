@@ -11,7 +11,7 @@ Real inverse(const Long& a, uint iterations) {
 		approx = approx * (two - approx * th);
 		if (count == 6) {
 			count = 0;
-			approx.cut(rs);
+			approx.cut(rs + 5);
 		}
 	//	std::cout << i << "   " << approx << std::endl;
 	}

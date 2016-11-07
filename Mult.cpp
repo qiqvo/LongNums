@@ -1,12 +1,12 @@
 #include "Long.h"
+#include "Real.h"
  
- 
-
-ull binsearch(const Long& a, const Long& b, Long& pr, ull l, ull r);
+template <class T>
+T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r);
 
 Long Long::mul(const Long& b) const
 {
-	bool fl = (bool)(sign * b.sign);
+	int fl = (sign * b.sign);
 	Long tmp;
 	int len = size() + b.size() - 1;
 	if (len <= 0) return null;
@@ -41,7 +41,6 @@ Long Long::divide(const int b, Long& rem) const
 	rem = c;
 	return r.normal().changeSign(fl);
 }
-
 Long Long::divide(const Long & b, Long& rem) const
 {
 	if (size() == 0 || b.size() == 0 || b == 0)
@@ -58,9 +57,9 @@ Long Long::divide(const Long & b, Long& rem) const
 		return divide((int)b[0], rem);
 
 	auto t = b;
-	bool fl = (bool)(sign);
+	int fl = (sign);
 	if (t < 0) {
-		fl = (bool)(fl * false);
+		fl = (fl * -1);
 		t.changeSign();
 	}
 
@@ -76,7 +75,7 @@ Long Long::divide(const Long & b, Long& rem) const
 			}
 			else {
 				auto pr = null;
-				auto mid = binsearch(c, b, pr, 0, base);
+				auto mid = binsearch<ull>(c, b, pr, 0, base);
 				c = c - pr;
 				if (c == null) 
 					c.clear();
@@ -90,12 +89,13 @@ Long Long::divide(const Long & b, Long& rem) const
 	rem = c.normal();
 	return r.normal().changeSign(fl);
 }
-
-ull binsearch(const Long& a, const Long& b, Long& pr, ull l, ull r) {
+template <class T>
+T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r) {
+	auto l = _l, r = _r;
 	auto mid = (r + l) / 2;
-	auto _l = l, _r = r, mid_pr = mid;
+	auto mid_pr = mid;
 	do {
-		pr = b.mul(mid);
+		pr = b * (mid);
 		mid_pr = mid;
 		if (pr < a) 
 			l = mid;
@@ -108,4 +108,52 @@ ull binsearch(const Long& a, const Long& b, Long& pr, ull l, ull r) {
 	} while (mid != mid_pr);
 
 	return mid;
+}
+
+Long Long::divide2(const Long & b, Long& rem) const
+{
+	if (size() == 0 || b.size() == 0 || b == 0)
+		throw "Division by zero!";
+	else if ((size() == 1 && a[0] == 0))
+		return 0;
+	else if (size() < b.size() || *this < b) {
+		rem = *this;
+		return null;
+	}
+	else if (*this == b)
+		return pone;
+	else if (b.size() == 1)
+		return divide((int)b[0], rem);
+
+	auto t = b;
+	int fl = (sign);
+	if (t < 0) {
+		fl = (fl * -1);
+		t.changeSign();
+	}
+
+	Long r, c;
+	ull tmp = 0;
+	r = binsearch(*this, b, c, null, *this);
+	c = *this - r;
+	if (c == null)
+		c.clear();
+
+	rem = c.normal();
+	return r.normal().changeSign(fl);
+}
+
+Long Long::mult_inv(const Long& b) const
+{
+	int fl = (sign * b.sign);
+	Long tmp;
+	int len = size() + b.size() - 1;
+	if (len <= 0) return null;
+
+	auto _b = inverse(b);
+	int i = 0;
+	while (size() * bs - i> 5 && b.size() * bs - i> 5) {
+		i += bs;
+	}
+	return to_Long(_b * *this);
 }

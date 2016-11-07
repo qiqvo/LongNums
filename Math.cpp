@@ -5,8 +5,6 @@
 #include "Random.h"
 
  
- 
-
 typedef QuadConGen RandGen;
 RandGen rg((ull)time(NULL));
 

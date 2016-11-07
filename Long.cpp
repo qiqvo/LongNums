@@ -30,8 +30,9 @@ inline std::string my_to_string(const ull& a, const int base)
 
 const ull Long::base = 10000;
 const uint Long::bs = std::log10(Long::base);
-const ull Long::karacnaive = 5;
-const ull Long::toom3naive = 5;
+const ull Long::karacnaive = 25;
+const ull Long::toom3naive = 30;
+const ull Long::strasnaive = 40;
 const char* Long::delim = ",";
 
 Long::Long() : sign(true) {}
@@ -180,10 +181,11 @@ Long Long::shiftback(uint n)
 }
 Long Long::changeSign(int b)
 {
-	if (b == (int)false) sign = false;
-	else if (b == (int)true) sign = true;
-	else sign = !sign;
-
+	if (b == 1) sign = 1;
+	else if (b == -1) sign = -1;
+	else {
+		sign = sign == 1 ? -1 : 1;
+	}
 	return *this;
 }
 
@@ -250,7 +252,7 @@ Long::Long(const char * v)
 	operator=(v);
 }
 
-Long::Long(vector<ull> x)
+Long::Long(const vector<ull>& x)
 {
 	operator=(x);
 }
@@ -348,7 +350,7 @@ Long Long::operator=(const char* v)
 	return *this;
 }
 
-Long Long::operator=(vector<ull> x)
+Long Long::operator=(const vector<ull>& x)
 {
 	clear();
 	insert(x);

@@ -1,27 +1,32 @@
 #include "Long.h"
 #include <thread>
-vector<int> rev;
+
+typedef std::complex<double> ReIm;
 
 struct fft {
 	vector<ReIm> wlen_pw;
+	vector<int> *rev;
 	void trans(vector<ReIm>& a, bool inv);
-	static void calc_rev(int n);
+	void calc_rev(vector<int> &_rev, int n);
 };
-
+//vector<int> fft::rev = (nullptr);
 Long Long::strassen_mul(const Long & b) const
 {
-	if (size() < 5 && b.size() < 5)
+	if (size() < strasnaive && b.size() < strasnaive)
 		return operator*(b);
 	vector<ReIm> fa(a.begin(), a.end()), fb(b.a.begin(), b.a.end());
 	uint n = 1;
-	bool flag = (bool)(sign * b.sign);
+	int flag = (sign * b.sign);
 
 	auto nmax = std::max((uint)a.size(), b.size());
 	while (n < nmax)  n <<= 1;
 	n <<= 1;
+	vector<int> rev(n);
 	fa.resize(n), fb.resize(n);
 	fft da, db, dc;
-	fft::calc_rev(n);
+	da.calc_rev(rev, n);
+	db.rev = &rev;
+	dc.rev = &rev;
 	
 	std::thread da_tr(&fft::trans, da, std::ref(fa), false);
 	//std::thread db_tr(&fft::trans, db, std::ref(fb), false);
@@ -50,8 +55,8 @@ void fft::trans(vector<ReIm>& a, bool inv)
 	uint n = a.size();
 
 	for (uint i = 0; i < n; ++i)
-		if (i < rev[i])
-			swap(a[i], a[rev[i]]);
+		if (i < (*rev)[i])
+			swap(a[i], a[(*rev)[i]]);
 
 	for (uint len = 2; len <= n; len <<= 1) {
 		double ang = 2 * PI / len * (inv ? -1 : 1);
@@ -83,15 +88,15 @@ void fft::trans(vector<ReIm>& a, bool inv)
 			a[i] /= n;
 }
 
-void fft::calc_rev(int n) {
-	rev = vector<int>(n);
+void fft::calc_rev(vector<int> &_rev, int n) {
+	rev = &_rev;
 	uint log_n = 0;
 	while ((1 << log_n) < n)  ++log_n;
 
 	for (uint i = 0; i < n; ++i) {
-		rev[i] = 0;
+		(*rev)[i] = 0;
 		for (uint j = 0; j < log_n; ++j)
 			if (i & (1 << j))
-				rev[i] |= 1 << (log_n - 1 - j);
+				(*rev)[i] |= 1 << (log_n - 1 - j);
 	}
 }

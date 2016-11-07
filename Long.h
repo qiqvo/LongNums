@@ -14,13 +14,12 @@
 #define _USE_MATH_DEFINES
 #define PI 3.14159265358979323846
 
-#define DEBUG
+//#define DEBUG
 
 using std::vector;
 using std::swap;
 typedef unsigned int uint;
 typedef unsigned short ush;
-typedef std::complex<double> ReIm;
 typedef unsigned long long ull;
 
 class Long;
@@ -29,7 +28,7 @@ class Real;
 class Long
 {
 protected:
-    bool sign;
+    int sign; // -1 for neg, 1 for pos 
 	static const char* delim;
 
 	Long();
@@ -44,6 +43,8 @@ protected:
 	vector<ull> a;   // 2383597  --->   a == { 7 , 9 , 5 , 3 ... 2 }
 	static const ull karacnaive;
 	static const ull toom3naive;
+	static const ull strasnaive;
+	
 public:
 	static const ull base;
 	static const uint bs; 
@@ -66,6 +67,8 @@ public:
 	Long mul(const Long& b) const;
 	Long divide(const int b, Long& rem) const;
 	Long divide(const Long& b, Long& rem) const;
+	Long divide2(const Long & b, Long& rem) const;
+	Long mult_inv(const Long& b) const;
 	Long karac_mul(const Long& b) const;
 	Long toomcook_mul(const Long & b) const;
 	Long strassen_mul(const Long & b) const; // using 2 threads! 
@@ -78,7 +81,7 @@ public:
 	Long(unsigned long);
 	Long(ull);
 	Long(const char*);
-	Long(vector<ull>); // dangerous! ((((
+	Long(const vector<ull>& x); // dangerous!
 
 	Long operator=(uint);
 	Long operator=(int);
@@ -87,7 +90,7 @@ public:
 	Long operator=(unsigned long);
 	Long operator=(ull);
 	Long operator=(const char *);
-	Long operator=(vector<ull>); // dangerous!
+	Long operator=(const vector<ull>& x); // dangerous!
 
 public:
 	Long(const Long &o);

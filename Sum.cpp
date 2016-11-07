@@ -4,9 +4,9 @@
 
 Long Long::sum(const Long& b) const
 {
-	bool fl = b.sign;
+	int fl = b.sign;
 	if (fl != sign) {  // -a xor -b
-		if (!fl) {     // a + (-b) == a - b
+		if (fl == -1) {     // a + (-b) == a - b
 			auto l = b;
 			return neg(l.changeSign());
 		}
@@ -30,8 +30,8 @@ Long Long::sum(const Long& b) const
 
 Long Long::neg(const Long & b) const
 {
-	if (b.sign == false ||                       //  a - (-b) == a + b
-		(sign == false && b.sign == true)) {    //  -a - b == -a + (-b)
+	if (b.sign == -1 ||                       //  a - (-b) == a + b
+		(sign == -1 && b.sign == 1)) {    //  -a - b == -a + (-b)
 		auto l = b;
 		return sum(l.changeSign());
 	}

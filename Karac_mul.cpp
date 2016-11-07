@@ -19,28 +19,19 @@ Long Long::karac_mul(const Long & b) const
 	Long yr(vector<ull>(k, (ull)0));
 	Long yl(vector<ull>(k, (ull)0));
 
-	auto f1 = [k](Long& wh, const Long& what) {
-		for (uint i = 0; i < k; ++i) {
-			wh.a[i] = what[i];
-		}
-	};
-	auto f2 = [k](Long& wh, const Long& what) {
-		for (uint i = k; i < k + k; ++i) {
-			wh.a[i - k] = what[i];
-		}
-	};
-	auto f = [k](Long& wh, const Long& what, int mode) {
+	static auto f = [](Long& wh, const Long& what, int k, int mode) {
 		if (mode == 1)
 			mode = k;
-		for (uint i = mode; i < k + mode; ++i) {
+		for (uint i = mode; i < k + mode && i < what.size(); ++i) {
 			wh.a[i - mode] = what[i];
 		}
 		wh.normal();
 	};
-	f(xr, *this, 0);
-	f(yr, b, 0);
-	f(xl, *this, 1);
-	f(yl, b, 1);
+	
+	f(xr, *this, k, 0);
+	f(yr, b, k, 0);
+	f(xl, *this, k, 1);
+	f(yl, b, k, 1);
 
 	Long xlyl = xl.karac_mul(yl);
 	Long xryr = xr.karac_mul(yr);

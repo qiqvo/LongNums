@@ -7,7 +7,6 @@ class Real : public Long{
 	Real normalmant();
 
 public:
-	// 0.000000000005151510000000021540000000058887 -> 0.00000000000515151
 	Real cut(uint t = 16);
 	uint set_mant(uint mant) { mantisa_place = mant; }
 	const uint get_mant() const { return mantisa_place; }
