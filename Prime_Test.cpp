@@ -108,7 +108,7 @@ double prtest_general(const Long & p, ull iter, double (*_met)(Long& a, const Lo
 	// Long a = pone;
 	PrimeTest::not_prime = 1.;
 	iter = iter / 4;
-	std::thread thr1, thr2, thr3;
+	// std::thread thr1, thr2, thr3;  // Temporarily disabled
 	while (PrimeTest::not_prime > 0. && l++ < iter) {
 		for (auto& i : a) {
 			i = rand(p.size(), p,
@@ -126,18 +126,11 @@ double prtest_general(const Long & p, ull iter, double (*_met)(Long& a, const Lo
 	    // _met(a[1], (pm[1]));
 	    // _met(a[2], (pm[2]));
 	    // _met(a[3], (pm[3]));
-		thr1 = std::thread(_met, a[0], (pm[0]));
-		thr2 = std::thread(_met, a[1], (pm[1]));
-		thr3 = std::thread(_met, a[2], (pm[2]));
-		//thr4 = std::thread(_met, a[3], (pm[3]));   
+		// Temporarily disable threading due to copy constructor issues
+		_met(a[0], (pm[0]));
+		_met(a[1], (pm[1]));
+		_met(a[2], (pm[2]));
 		_met(a[3], (pm[3]));
-		 
-		if (thr1.joinable())
-			thr1.join();
-		if (thr2.joinable())
-		    thr2.join();
-		if (thr3.joinable())
-			thr3.join();
 		// if (thr4.joinable())
 		//  	thr4.join();
 	}
