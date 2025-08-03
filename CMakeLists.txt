@@ -19,6 +19,7 @@ find_package(Threads REQUIRED)
 set(SOURCES
     src/main.cpp
     src/core/long.cpp
+    src/core/matrix.cpp
     src/core/real.cpp
     src/random/random.cpp
     src/math/toomcook_mul.cpp
@@ -31,8 +32,12 @@ set(SOURCES
 # Header files
 set(HEADERS
     include/core/long.h
+    include/core/matrix.h
     include/core/real.h
     include/random/random.h
+    include/math/math.h
+    include/prime/prime_test.h
+    include/utils/utils.h
 )
 
 # Create executable
