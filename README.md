@@ -23,6 +23,39 @@ A C++ library for long number arithmetic with multiple multiplication algorithms
 - **Multi-threading Support** - Parallel computation for large operations
 - **Mathematical Functions** - GCD, factorial, modular exponentiation
 
+## Project Structure
+
+```
+LongNums/
+├── CMakeLists.txt          # CMake build configuration
+├── Makefile               # Traditional Makefile
+├── build.sh               # Convenient build script
+├── README.md              # Project documentation
+├── BUILD_GUIDE.md         # Build instructions
+├── .gitignore             # Git ignore rules
+├── include/               # Header files
+│   ├── Long.h            # Long integer class
+│   ├── Real.h            # Real number class
+│   └── Random.h          # Random number generation
+├── src/                   # Source files
+│   ├── Source.cpp        # Main program entry point
+│   ├── Long.cpp          # Long integer implementation
+│   ├── Real.cpp          # Real number implementation
+│   ├── Random.cpp        # Random number generation
+│   ├── Karac_mul.cpp     # Karatsuba multiplication
+│   ├── Toomcook_mul.cpp  # Toom-Cook multiplication
+│   ├── Strassen_mul.cpp  # Strassen multiplication
+│   ├── Sum.cpp           # Addition operations
+│   ├── Mult.cpp          # Basic multiplication
+│   ├── Operators.cpp     # Arithmetic operators
+│   ├── Compare.cpp       # Comparison operations
+│   ├── Division_Inverse.cpp # Division operations
+│   ├── Math.cpp          # Mathematical functions
+│   └── Prime_Test.cpp    # Prime testing algorithms
+└── tests/                # Test files
+    └── test_basic.cpp    # Basic functionality tests
+```
+
 ## Build Instructions
 
 ### Prerequisites
@@ -64,47 +97,40 @@ make run
 make clean
 ```
 
+### Using Build Script
+
+```bash
+# Build and run
+./build.sh run
+
+# Build release version
+./build.sh release
+
+# Build debug version
+./build.sh debug
+
+# Clean build artifacts
+./build.sh clean
+```
+
 ### Direct Compilation
 
 ```bash
 # Simple compilation
-g++ -std=c++17 -O2 -pthread *.cpp -o LongNums
+g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
 
 # With debug symbols
-g++ -std=c++17 -g -DDEBUG -pthread *.cpp -o LongNums
+g++ -std=c++17 -g -DDEBUG -pthread -Iinclude src/*.cpp -o LongNums
 
 # With maximum optimization
-g++ -std=c++17 -O3 -DNDEBUG -pthread *.cpp -o LongNums
-```
-
-## Project Structure
-
-```
-LongNums/
-├── CMakeLists.txt          # CMake build configuration
-├── Makefile               # Traditional Makefile
-├── README.md              # This file
-├── Source.cpp             # Main program entry point
-├── Long.h/.cpp            # Long integer class implementation
-├── Real.h/.cpp            # Real number class implementation
-├── Random.h/.cpp          # Random number generation
-├── Karac_mul.cpp          # Karatsuba multiplication
-├── Toomcook_mul.cpp       # Toom-Cook multiplication
-├── Strassen_mul.cpp       # Strassen multiplication (multi-threaded)
-├── Sum.cpp                # Addition operations
-├── Mult.cpp               # Basic multiplication
-├── Operators.cpp          # Arithmetic operators
-├── Compare.cpp            # Comparison operations
-├── Division_Inverse.cpp   # Division and inverse operations
-├── Math.cpp               # Mathematical functions
-└── Prime_Test.cpp         # Prime testing algorithms
+g++ -std=c++17 -O3 -DNDEBUG -pthread -Iinclude src/*.cpp -o LongNums
 ```
 
 ## Usage Examples
 
 ### Basic Arithmetic
 ```cpp
-#include "Long.h"
+#include "include/Long.h"
 
 Long a = "12345678901234567890";
 Long b = "98765432109876543210";
@@ -132,11 +158,21 @@ double rabin_result = prtest_RabinMiller(prime_candidate, 26);
 
 ### Real Numbers
 ```cpp
-#include "Real.h"
+#include "include/Real.h"
 
 Real a(1000, 1);  // Represents 0.1
 Real b(2000, 1);  // Represents 0.2
 Real c = a + b;    // Result: 0.3
+```
+
+## Testing
+
+The project includes a basic test framework in the `tests/` directory:
+
+```bash
+# Compile and run tests
+g++ -std=c++17 -Iinclude tests/test_basic.cpp src/*.cpp -o test_basic
+./test_basic
 ```
 
 ## Performance Considerations

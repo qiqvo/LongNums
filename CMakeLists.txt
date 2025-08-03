@@ -17,27 +17,27 @@ find_package(Threads REQUIRED)
 
 # Source files
 set(SOURCES
-    Source.cpp
-    Long.cpp
-    Real.cpp
-    Random.cpp
-    Sum.cpp
-    Mult.cpp
-    Operators.cpp
-    Compare.cpp
-    Karac_mul.cpp
-    Toomcook_mul.cpp
-    Strassen_mul.cpp
-    Division_Inverse.cpp
-    Math.cpp
-    Prime_Test.cpp
+    src/Source.cpp
+    src/Long.cpp
+    src/Real.cpp
+    src/Random.cpp
+    src/Sum.cpp
+    src/Mult.cpp
+    src/Operators.cpp
+    src/Compare.cpp
+    src/Karac_mul.cpp
+    src/Toomcook_mul.cpp
+    src/Strassen_mul.cpp
+    src/Division_Inverse.cpp
+    src/Math.cpp
+    src/Prime_Test.cpp
 )
 
 # Header files
 set(HEADERS
-    Long.h
-    Real.h
-    Random.h
+    include/Long.h
+    include/Real.h
+    include/Random.h
 )
 
 # Create executable
@@ -47,7 +47,10 @@ add_executable(LongNums ${SOURCES} ${HEADERS})
 target_link_libraries(LongNums PRIVATE Threads::Threads)
 
 # Include directories
-target_include_directories(LongNums PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(LongNums PRIVATE 
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 # Set output directory
 set_target_properties(LongNums PROPERTIES
@@ -64,4 +67,6 @@ message(STATUS "LongNums Configuration:")
 message(STATUS "  C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "  Compiler: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "  Output Directory: ${CMAKE_BINARY_DIR}/bin") 
+message(STATUS "  Output Directory: ${CMAKE_BINARY_DIR}/bin")
+message(STATUS "  Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}/src")
+message(STATUS "  Include Directory: ${CMAKE_CURRENT_SOURCE_DIR}/include") 

@@ -79,17 +79,17 @@ make run
 
 **Simple compilation:**
 ```bash
-g++ -std=c++17 -O2 -pthread *.cpp -o LongNums
+g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
 ```
 
 **With debug symbols:**
 ```bash
-g++ -std=c++17 -g -DDEBUG -pthread *.cpp -o LongNums
+g++ -std=c++17 -g -DDEBUG -pthread -Iinclude src/*.cpp -o LongNums
 ```
 
 **With maximum optimization:**
 ```bash
-g++ -std=c++17 -O3 -DNDEBUG -pthread *.cpp -o LongNums
+g++ -std=c++17 -O3 -DNDEBUG -pthread -Iinclude src/*.cpp -o LongNums
 ```
 
 ## Build Script Options
@@ -119,20 +119,27 @@ LongNums/
 ├── README.md              # Project documentation
 ├── BUILD_GUIDE.md         # This file
 ├── .gitignore             # Git ignore rules
-├── Source.cpp             # Main program
-├── Long.h/.cpp            # Long integer class
-├── Real.h/.cpp            # Real number class
-├── Random.h/.cpp          # Random number generation
-├── Karac_mul.cpp          # Karatsuba multiplication
-├── Toomcook_mul.cpp       # Toom-Cook multiplication
-├── Strassen_mul.cpp       # Strassen multiplication
-├── Sum.cpp                # Addition operations
-├── Mult.cpp               # Basic multiplication
-├── Operators.cpp          # Arithmetic operators
-├── Compare.cpp            # Comparison operations
-├── Division_Inverse.cpp   # Division operations
-├── Math.cpp               # Mathematical functions
-└── Prime_Test.cpp         # Prime testing algorithms
+├── include/               # Header files
+│   ├── Long.h            # Long integer class
+│   ├── Real.h            # Real number class
+│   └── Random.h          # Random number generation
+├── src/                   # Source files
+│   ├── Source.cpp        # Main program
+│   ├── Long.cpp          # Long integer implementation
+│   ├── Real.cpp          # Real number implementation
+│   ├── Random.cpp        # Random number generation
+│   ├── Karac_mul.cpp     # Karatsuba multiplication
+│   ├── Toomcook_mul.cpp  # Toom-Cook multiplication
+│   ├── Strassen_mul.cpp  # Strassen multiplication
+│   ├── Sum.cpp           # Addition operations
+│   ├── Mult.cpp          # Basic multiplication
+│   ├── Operators.cpp     # Arithmetic operators
+│   ├── Compare.cpp       # Comparison operations
+│   ├── Division_Inverse.cpp # Division operations
+│   ├── Math.cpp          # Mathematical functions
+│   └── Prime_Test.cpp    # Prime testing algorithms
+└── tests/                # Test files
+    └── test_basic.cpp    # Basic functionality tests
 ```
 
 ## Build Outputs
@@ -147,6 +154,16 @@ LongNums/
 
 ### Direct Compilation
 - **Executable:** `LongNums` (in current directory)
+
+## Testing
+
+The project includes a basic test framework:
+
+```bash
+# Compile and run tests
+g++ -std=c++17 -Iinclude tests/test_basic.cpp src/*.cpp -o test_basic
+./test_basic
+```
 
 ## Troubleshooting
 
@@ -163,6 +180,10 @@ LongNums/
 3. **Compiler warnings**
    - Most warnings are harmless
    - Can be suppressed by adding `-Wno-sign-compare` to compiler flags
+
+4. **Include path issues**
+   - Make sure to use `-Iinclude` flag when compiling directly
+   - Build systems handle this automatically
 
 ### Platform-Specific Notes
 
@@ -199,12 +220,20 @@ LongNums/
 
 2. **Development cycle:**
    ```bash
-   # Make changes to source files
+   # Make changes to source files in src/
+   # Make changes to headers in include/
    ./build.sh debug    # Build with debug symbols
    ./build.sh run      # Test the program
    ```
 
-3. **Clean build:**
+3. **Testing:**
+   ```bash
+   # Run basic tests
+   g++ -std=c++17 -Iinclude tests/test_basic.cpp src/*.cpp -o test_basic
+   ./test_basic
+   ```
+
+4. **Clean build:**
    ```bash
    ./build.sh clean    # Remove all build artifacts
    ./build.sh release  # Fresh build
@@ -218,6 +247,7 @@ When contributing to the project:
 2. Test both CMake and Makefile builds
 3. Ensure the program compiles without errors
 4. Address any new compiler warnings
+5. Add tests to the `tests/` directory for new features
 
 ## License
 
