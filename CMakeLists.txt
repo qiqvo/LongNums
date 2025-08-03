@@ -42,6 +42,9 @@ set(SOURCES
 # Create executable
 add_executable(alphatensor_cpp ${SOURCES})
 
+# Create unified matrix example executable (disabled - missing unified_matrix.h)
+# add_executable(unified_example example_unified.cpp)
+
 # Link libraries
 if(OpenMP_CXX_FOUND)
     target_link_libraries(alphatensor_cpp OpenMP::OpenMP_CXX)

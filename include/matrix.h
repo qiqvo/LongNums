@@ -32,6 +32,18 @@ public:
     using value_type = T;
     using size_type = std::size_t;
 
+    // Algorithm types for matrix multiplication
+    enum class Algorithm {
+        NAIVE,
+        BLOCK,
+        STRASSEN,
+        WINOGRAD,
+        ALPHATENSOR_GPU,
+        ALPHATENSOR_TPU,
+        HYBRID,
+        AUTO  // Automatically choose the best algorithm
+    };
+
     // Constructors
     Matrix();
     Matrix(size_type rows, size_type cols);
@@ -58,6 +70,30 @@ public:
     Matrix& operator-=(const Matrix& other);
     Matrix& operator*=(value_type scalar);
     Matrix operator*(value_type scalar) const;
+    
+    // Matrix multiplication with algorithm selection
+    Matrix multiply(const Matrix& other, Algorithm algo = Algorithm::AUTO) const;
+    
+    // Individual algorithm implementations
+    Matrix multiply_naive(const Matrix& other) const;
+    Matrix multiply_block(const Matrix& other, size_type block_size = 64) const;
+    Matrix multiply_strassen(const Matrix& other) const;
+    Matrix multiply_winograd(const Matrix& other) const;
+    Matrix multiply_alphatensor(const Matrix& other, const std::string& variant = "gpu") const;
+    Matrix multiply_hybrid(const Matrix& other) const;
+    
+    // Algorithm selection and configuration
+    static Algorithm select_best_algorithm(size_type size);
+    static void set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size);
+    
+    // Thresholds structure for algorithm configuration
+    struct Thresholds {
+        size_type naive_threshold = 64;
+        size_type strassen_threshold = 512;
+        size_type block_size = 64;
+    };
+    
+    static Thresholds get_thresholds();
     
     // Utility methods
     size_type rows() const;
@@ -100,10 +136,21 @@ private:
     size_type cols_;
     std::vector<value_type> data_;
     
+    // Static configuration for algorithm selection
+    static Thresholds thresholds_;
+    
     // Helper methods
     size_type index(size_type row, size_type col) const;
     void check_dimensions(const Matrix& other, const std::string& operation) const;
     void check_bounds(size_type row, size_type col) const;
+    
+    // Private algorithm helper methods
+    Matrix strassen_recursive(const Matrix& A, const Matrix& B) const;
+    Matrix strassen_2x2(const Matrix& A, const Matrix& B) const;
+    Matrix winograd_recursive(const Matrix& A, const Matrix& B) const;
+    Matrix winograd_2x2(const Matrix& A, const Matrix& B) const;
+    Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B) const;
+    Matrix alpha_tensor_2x2(const Matrix& A, const Matrix& B) const;
 };
 
 // Free functions

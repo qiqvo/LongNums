@@ -368,6 +368,409 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
     return result;
 }
 
+// Static member initialization
+template<typename T>
+typename Matrix<T>::Thresholds Matrix<T>::thresholds_ = {64, 512, 64};
+
+// Matrix multiplication with algorithm selection
+template<typename T>
+Matrix<T> Matrix<T>::multiply(const Matrix& other, Algorithm algo) const {
+    if (algo == Algorithm::AUTO) {
+        algo = select_best_algorithm(rows_);
+    }
+    
+    switch (algo) {
+        case Algorithm::NAIVE:
+            return multiply_naive(other);
+        case Algorithm::BLOCK:
+            return multiply_block(other, thresholds_.block_size);
+        case Algorithm::STRASSEN:
+            return multiply_strassen(other);
+        case Algorithm::WINOGRAD:
+            return multiply_winograd(other);
+        case Algorithm::ALPHATENSOR_GPU:
+            return multiply_alphatensor(other, "gpu");
+        case Algorithm::ALPHATENSOR_TPU:
+            return multiply_alphatensor(other, "tpu");
+        case Algorithm::HYBRID:
+            return multiply_hybrid(other);
+        default:
+            return multiply_naive(other);
+    }
+}
+
+// Individual algorithm implementations
+template<typename T>
+Matrix<T> Matrix<T>::multiply_naive(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    Matrix result(rows_, other.cols_);
+    
+    for (size_type i = 0; i < rows_; ++i) {
+        for (size_type j = 0; j < other.cols_; ++j) {
+            value_type sum = 0.0;
+            for (size_type k = 0; k < cols_; ++k) {
+                sum += (*this)(i, k) * other(k, j);
+            }
+            result(i, j) = sum;
+        }
+    }
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_block(const Matrix& other, size_type block_size) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    Matrix result(rows_, other.cols_);
+    result.zero();
+    
+    for (size_type i = 0; i < rows_; i += block_size) {
+        for (size_type j = 0; j < other.cols_; j += block_size) {
+            for (size_type k = 0; k < cols_; k += block_size) {
+                // Process block
+                size_type i_end = std::min(i + block_size, rows_);
+                size_type j_end = std::min(j + block_size, other.cols_);
+                size_type k_end = std::min(k + block_size, cols_);
+                
+                for (size_type ii = i; ii < i_end; ++ii) {
+                    for (size_type jj = j; jj < j_end; ++jj) {
+                        for (size_type kk = k; kk < k_end; ++kk) {
+                            result(ii, jj) += (*this)(ii, kk) * other(kk, jj);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_strassen(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    return strassen_recursive(*this, other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_winograd(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    return winograd_recursive(*this, other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_alphatensor(const Matrix& other, const std::string& variant) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    size_type n = rows_;
+    
+    // For 4x4 matrices, use the AlphaTensor factorization
+    if (n == 4) {
+        return alpha_tensor_4x4(*this, other);
+    }
+    
+    // For 2x2 matrices, use the basic 2x2 algorithm
+    if (n == 2) {
+        return alpha_tensor_2x2(*this, other);
+    }
+    
+    // For other sizes, fall back to Strassen's algorithm
+    return multiply_strassen(other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_hybrid(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    size_type size = rows_;
+    
+    if (size <= thresholds_.naive_threshold) {
+        return multiply_naive(other);
+    } else if (size <= thresholds_.strassen_threshold) {
+        return multiply_block(other, thresholds_.block_size);
+    } else {
+        return multiply_strassen(other);
+    }
+}
+
+// Algorithm selection and configuration
+template<typename T>
+typename Matrix<T>::Algorithm Matrix<T>::select_best_algorithm(size_type size) {
+    if (size <= thresholds_.naive_threshold) {
+        return Algorithm::NAIVE;
+    } else if (size <= thresholds_.strassen_threshold) {
+        return Algorithm::BLOCK;
+    } else {
+        return Algorithm::STRASSEN;
+    }
+}
+
+template<typename T>
+void Matrix<T>::set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size) {
+    thresholds_.naive_threshold = naive_threshold;
+    thresholds_.strassen_threshold = strassen_threshold;
+    thresholds_.block_size = block_size;
+}
+
+template<typename T>
+typename Matrix<T>::Thresholds Matrix<T>::get_thresholds() {
+    return thresholds_;
+}
+
+// Private algorithm helper methods
+template<typename T>
+Matrix<T> Matrix<T>::strassen_recursive(const Matrix& A, const Matrix& B) const {
+    size_type n = A.rows();
+    
+    if (n <= 2) {
+        return strassen_2x2(A, B);
+    }
+    
+    // Pad matrices to next power of 2 if necessary
+    size_type new_size = 1;
+    while (new_size < n) {
+        new_size *= 2;
+    }
+    
+    if (new_size != n) {
+        Matrix A_padded(new_size, new_size);
+        Matrix B_padded(new_size, new_size);
+        
+        // Copy original matrices
+        for (size_type i = 0; i < n; ++i) {
+            for (size_type j = 0; j < n; ++j) {
+                A_padded(i, j) = A(i, j);
+                B_padded(i, j) = B(i, j);
+            }
+        }
+        
+        Matrix result_padded = strassen_recursive(A_padded, B_padded);
+        
+        // Extract result
+        Matrix result(n, n);
+        for (size_type i = 0; i < n; ++i) {
+            for (size_type j = 0; j < n; ++j) {
+                result(i, j) = result_padded(i, j);
+            }
+        }
+        
+        return result;
+    }
+    
+    // Split matrices into quadrants
+    size_type half = n / 2;
+    
+    Matrix A11 = A.submatrix(0, 0, half, half);
+    Matrix A12 = A.submatrix(0, half, half, n);
+    Matrix A21 = A.submatrix(half, 0, n, half);
+    Matrix A22 = A.submatrix(half, half, n, n);
+    
+    Matrix B11 = B.submatrix(0, 0, half, half);
+    Matrix B12 = B.submatrix(0, half, half, n);
+    Matrix B21 = B.submatrix(half, 0, n, half);
+    Matrix B22 = B.submatrix(half, half, n, n);
+    
+    // Strassen's seven multiplications
+    Matrix P1 = strassen_recursive(A11, B12 - B22);
+    Matrix P2 = strassen_recursive(A11 + A12, B22);
+    Matrix P3 = strassen_recursive(A21 + A22, B11);
+    Matrix P4 = strassen_recursive(A22, B21 - B11);
+    Matrix P5 = strassen_recursive(A11 + A22, B11 + B22);
+    Matrix P6 = strassen_recursive(A12 - A22, B21 + B22);
+    Matrix P7 = strassen_recursive(A11 - A21, B11 + B12);
+    
+    // Combine results
+    Matrix C11 = P5 + P4 - P2 + P6;
+    Matrix C12 = P1 + P2;
+    Matrix C21 = P3 + P4;
+    Matrix C22 = P5 + P1 - P3 - P7;
+    
+    // Combine quadrants into result
+    Matrix result(n, n);
+    result.set_submatrix(0, 0, C11);
+    result.set_submatrix(0, half, C12);
+    result.set_submatrix(half, 0, C21);
+    result.set_submatrix(half, half, C22);
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::strassen_2x2(const Matrix& A, const Matrix& B) const {
+    Matrix result(2, 2);
+    
+    // Direct 2x2 multiplication (Strassen's algorithm for 2x2)
+    T P1 = A(0, 0) * (B(0, 1) - B(1, 1));
+    T P2 = (A(0, 0) + A(0, 1)) * B(1, 1);
+    T P3 = (A(1, 0) + A(1, 1)) * B(0, 0);
+    T P4 = A(1, 1) * (B(1, 0) - B(0, 0));
+    T P5 = (A(0, 0) + A(1, 1)) * (B(0, 0) + B(1, 1));
+    T P6 = (A(0, 1) - A(1, 1)) * (B(1, 0) + B(1, 1));
+    T P7 = (A(0, 0) - A(1, 0)) * (B(0, 0) + B(0, 1));
+    
+    result(0, 0) = P5 + P4 - P2 + P6;
+    result(0, 1) = P1 + P2;
+    result(1, 0) = P3 + P4;
+    result(1, 1) = P5 + P1 - P3 - P7;
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::winograd_recursive(const Matrix& A, const Matrix& B) const {
+    size_type n = A.rows();
+    
+    if (n <= 2) {
+        return winograd_2x2(A, B);
+    }
+    
+    // Pad matrices to next power of 2 if necessary
+    size_type new_size = 1;
+    while (new_size < n) {
+        new_size *= 2;
+    }
+    
+    if (new_size != n) {
+        Matrix A_padded(new_size, new_size);
+        Matrix B_padded(new_size, new_size);
+        
+        // Copy original matrices
+        for (size_type i = 0; i < n; ++i) {
+            for (size_type j = 0; j < n; ++j) {
+                A_padded(i, j) = A(i, j);
+                B_padded(i, j) = B(i, j);
+            }
+        }
+        
+        Matrix result_padded = winograd_recursive(A_padded, B_padded);
+        
+        // Extract result
+        Matrix result(n, n);
+        for (size_type i = 0; i < n; ++i) {
+            for (size_type j = 0; j < n; ++j) {
+                result(i, j) = result_padded(i, j);
+            }
+        }
+        
+        return result;
+    }
+    
+    // Winograd's algorithm implementation
+    // This is a simplified version - in practice, you'd use the full Winograd algorithm
+    return strassen_recursive(A, B); // Fall back to Strassen for now
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::winograd_2x2(const Matrix& A, const Matrix& B) const {
+    Matrix result(2, 2);
+    
+    // Direct 2x2 multiplication
+    result(0, 0) = A(0, 0) * B(0, 0) + A(0, 1) * B(1, 0);
+    result(0, 1) = A(0, 0) * B(0, 1) + A(0, 1) * B(1, 1);
+    result(1, 0) = A(1, 0) * B(0, 0) + A(1, 1) * B(1, 0);
+    result(1, 1) = A(1, 0) * B(0, 1) + A(1, 1) * B(1, 1);
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::alpha_tensor_4x4(const Matrix& A, const Matrix& B) const {
+    // Simplified AlphaTensor implementation for 4x4 matrices
+    Matrix result(4, 4);
+    result.zero();
+    
+    // Split matrices into 2x2 blocks
+    Matrix A11 = A.submatrix(0, 0, 2, 2);
+    Matrix A12 = A.submatrix(0, 2, 2, 4);
+    Matrix A21 = A.submatrix(2, 0, 4, 2);
+    Matrix A22 = A.submatrix(2, 2, 4, 4);
+    
+    Matrix B11 = B.submatrix(0, 0, 2, 2);
+    Matrix B12 = B.submatrix(0, 2, 2, 4);
+    Matrix B21 = B.submatrix(2, 0, 4, 2);
+    Matrix B22 = B.submatrix(2, 2, 4, 4);
+    
+    // Strassen's seven multiplications
+    Matrix P1 = alpha_tensor_2x2(A11, B12 - B22);
+    Matrix P2 = alpha_tensor_2x2(A11 + A12, B22);
+    Matrix P3 = alpha_tensor_2x2(A21 + A22, B11);
+    Matrix P4 = alpha_tensor_2x2(A22, B21 - B11);
+    Matrix P5 = alpha_tensor_2x2(A11 + A22, B11 + B22);
+    Matrix P6 = alpha_tensor_2x2(A12 - A22, B21 + B22);
+    Matrix P7 = alpha_tensor_2x2(A11 - A21, B11 + B12);
+    
+    // Combine results
+    Matrix C11 = P5 + P4 - P2 + P6;
+    Matrix C12 = P1 + P2;
+    Matrix C21 = P3 + P4;
+    Matrix C22 = P5 + P1 - P3 - P7;
+    
+    // Combine quadrants into result
+    result.set_submatrix(0, 0, C11);
+    result.set_submatrix(0, 2, C12);
+    result.set_submatrix(2, 0, C21);
+    result.set_submatrix(2, 2, C22);
+    
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::alpha_tensor_2x2(const Matrix& A, const Matrix& B) const {
+    Matrix result(2, 2);
+    
+    // Direct 2x2 multiplication (Strassen's algorithm for 2x2)
+    T P1 = A(0, 0) * (B(0, 1) - B(1, 1));
+    T P2 = (A(0, 0) + A(0, 1)) * B(1, 1);
+    T P3 = (A(1, 0) + A(1, 1)) * B(0, 0);
+    T P4 = A(1, 1) * (B(1, 0) - B(0, 0));
+    T P5 = (A(0, 0) + A(1, 1)) * (B(0, 0) + B(1, 1));
+    T P6 = (A(0, 1) - A(1, 1)) * (B(1, 0) + B(1, 1));
+    T P7 = (A(0, 0) - A(1, 0)) * (B(0, 0) + B(0, 1));
+    
+    result(0, 0) = P5 + P4 - P2 + P6;
+    result(0, 1) = P1 + P2;
+    result(1, 0) = P3 + P4;
+    result(1, 1) = P5 + P1 - P3 - P7;
+    
+    return result;
+}
+
 } // namespace alphatensor
 
 #endif // ALPHATENSOR_MATRIX_FUNCTIONS 

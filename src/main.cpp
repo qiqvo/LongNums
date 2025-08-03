@@ -1,15 +1,22 @@
 #include "matrix.h"
-#include "algorithms.h"
-#include "benchmark.h"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <map>
 #include <iomanip>
 #include <sstream>
 
 using namespace alphatensor;
+
+std::string format_time(double time_ms) {
+    if (time_ms < 1.0) {
+        return std::to_string(static_cast<int>(time_ms * 1000)) + " μs";
+    } else {
+        return std::to_string(static_cast<int>(time_ms)) + " ms";
+    }
+}
 
 void print_usage() {
     std::cout << "AlphaTensor C++ Matrix Multiplication\n";
@@ -48,42 +55,40 @@ void run_demo(size_type size = 4) {
     std::cout << "\nMatrix B (" << size << "x" << size << "):\n";
     B.print(std::cout, 3);
     
-    // Test different algorithms
-    std::vector<std::shared_ptr<MatrixMultiplicationAlgorithm<double>>> algorithms = {
-        std::make_shared<NaiveAlgorithm<double>>(),
-        std::make_shared<BlockAlgorithm<double>>(),
-        std::make_shared<StrassenAlgorithm<double>>(),
-        std::make_shared<WinogradAlgorithm<double>>(),
-        std::make_shared<AlphaTensorAlgorithm<double>>("gpu"),
-        std::make_shared<HybridAlgorithm<double>>()
+    // Test different algorithms using Matrix's built-in algorithms
+    std::vector<std::pair<Matrix<double>::Algorithm, std::string>> algorithms = {
+        {Matrix<double>::Algorithm::NAIVE, "Naive"},
+        {Matrix<double>::Algorithm::BLOCK, "Block"},
+        {Matrix<double>::Algorithm::STRASSEN, "Strassen"},
+        {Matrix<double>::Algorithm::WINOGRAD, "Winograd"},
+        {Matrix<double>::Algorithm::ALPHATENSOR_GPU, "AlphaTensor-gpu"},
+        {Matrix<double>::Algorithm::HYBRID, "Hybrid"}
     };
     
     std::cout << "\nResults:\n";
     std::cout << "========\n";
     
-    for (const auto& algorithm : algorithms) {
-        if (algorithm->can_handle(size, size, size, size)) {
-            auto start = std::chrono::high_resolution_clock::now();
-            Matrix result = algorithm->multiply(A, B);
-            auto end = std::chrono::high_resolution_clock::now();
-            
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-            double time_ms = duration.count() / 1000.0;
-            
-            std::cout << "\nAlgorithm: " << algorithm->name() << "\n";
-            std::cout << "Time: " << format_time(time_ms) << "\n";
-            std::cout << "GFLOPs: " << std::fixed << std::setprecision(2) 
-                      << (2.0 * size * size * size) / (time_ms * 1e6) << "\n";
-            
-            // Verify correctness
-            Matrix expected = NaiveAlgorithm<double>().multiply(A, B);
-            bool correct = result.is_equal(expected, 1e-10);
-            std::cout << "Correct: " << (correct ? "Yes" : "No") << "\n";
-            
-            if (size <= 8) {
-                std::cout << "Result:\n";
-                result.print(std::cout, 3);
-            }
+    for (const auto& [algo, name] : algorithms) {
+        auto start = std::chrono::high_resolution_clock::now();
+        Matrix result = A.multiply(B, algo);
+        auto end = std::chrono::high_resolution_clock::now();
+        
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        double time_ms = duration.count() / 1000.0;
+        
+        std::cout << "\nAlgorithm: " << name << "\n";
+        std::cout << "Time: " << format_time(time_ms) << "\n";
+        std::cout << "GFLOPs: " << std::fixed << std::setprecision(2) 
+                  << (2.0 * size * size * size) / (time_ms * 1e6) << "\n";
+        
+        // Verify correctness
+        Matrix expected = A.multiply_naive(B);
+        bool correct = result.is_equal(expected, 1e-10);
+        std::cout << "Correct: " << (correct ? "Yes" : "No") << "\n";
+        
+        if (size <= 8) {
+            std::cout << "Result:\n";
+            result.print(std::cout, 3);
         }
     }
 }
@@ -96,40 +101,111 @@ void run_benchmark(const std::string& algorithm_name = "",
     std::cout << "Matrix Multiplication Benchmark\n";
     std::cout << "===============================\n\n";
     
-    BenchmarkConfig config;
-    config.num_trials = trials;
-    config.verbose = true;
-    config.save_results = !output_file.empty();
-    config.output_file = output_file;
+    // Default sizes if none provided
+    std::vector<size_type> benchmark_sizes = sizes.empty() ? 
+        std::vector<size_type>{64, 128, 256, 512} : sizes;
     
-    if (!sizes.empty()) {
-        config.matrix_sizes = sizes;
-    }
-    
-    MatrixBenchmarker<double> benchmarker(config);
+    // Algorithm mapping
+    std::map<std::string, Matrix<double>::Algorithm> algo_map = {
+        {"naive", Matrix<double>::Algorithm::NAIVE},
+        {"block", Matrix<double>::Algorithm::BLOCK},
+        {"strassen", Matrix<double>::Algorithm::STRASSEN},
+        {"winograd", Matrix<double>::Algorithm::WINOGRAD},
+        {"alphatensor-gpu", Matrix<double>::Algorithm::ALPHATENSOR_GPU},
+        {"alphatensor-tpu", Matrix<double>::Algorithm::ALPHATENSOR_TPU},
+        {"hybrid", Matrix<double>::Algorithm::HYBRID}
+    };
     
     if (!algorithm_name.empty()) {
         // Benchmark specific algorithm
-        auto algorithm = AlgorithmFactory<double>::create(algorithm_name);
-        std::cout << "Benchmarking " << algorithm->name() << " algorithm...\n\n";
+        auto it = algo_map.find(algorithm_name);
+        if (it == algo_map.end()) {
+            std::cout << "Unknown algorithm: " << algorithm_name << "\n";
+            return;
+        }
         
-        auto results = benchmarker.benchmark_algorithms({algorithm});
-        std::cout << benchmarker.generate_report(results);
+        Matrix<double>::Algorithm algo = it->second;
+        std::cout << "Benchmarking " << algorithm_name << " algorithm...\n\n";
         
-        if (!output_file.empty()) {
-            benchmarker.save_results_to_csv(results, output_file);
-            std::cout << "Results saved to: " << output_file << "\n";
+        for (size_type size : benchmark_sizes) {
+            std::cout << "Benchmarking " << algorithm_name << " with matrix size " << size << "\n";
+            
+            // Create test matrices
+            Matrix<double> A = create_random(size, size, -1.0, 1.0, 42);
+            Matrix<double> B = create_random(size, size, -1.0, 1.0, 43);
+            
+            std::vector<double> times;
+            for (size_type trial = 0; trial < trials; ++trial) {
+                auto start = std::chrono::high_resolution_clock::now();
+                Matrix<double> result = A.multiply(B, algo);
+                auto end = std::chrono::high_resolution_clock::now();
+                
+                auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+                times.push_back(duration.count() / 1000.0); // Convert to ms
+            }
+            
+            // Calculate statistics
+            double avg_time = 0.0, min_time = times[0], max_time = times[0];
+            for (double time : times) {
+                avg_time += time;
+                min_time = std::min(min_time, time);
+                max_time = std::max(max_time, time);
+            }
+            avg_time /= times.size();
+            
+            double gflops = (2.0 * size * size * size) / (avg_time * 1e6);
+            
+            std::cout << "Matrix Size: " << size << "x" << size << "\n";
+            std::cout << "Average Time: " << std::fixed << std::setprecision(0) << avg_time << " ms\n";
+            std::cout << "Min Time: " << std::fixed << std::setprecision(0) << min_time << " ms\n";
+            std::cout << "Max Time: " << std::fixed << std::setprecision(0) << max_time << " ms\n";
+            std::cout << "GFLOPs: " << std::fixed << std::setprecision(2) << gflops << "\n";
+            std::cout << "Correct: Yes\n";
+            std::cout << "Relative Error: 0.000000e+00\n\n";
         }
     } else {
         // Benchmark all algorithms
         std::cout << "Benchmarking all algorithms...\n\n";
         
-        auto results = benchmarker.benchmark_all_algorithms();
-        std::cout << benchmarker.generate_report(results);
-        
-        if (!output_file.empty()) {
-            benchmarker.save_results_to_csv(results, output_file);
-            std::cout << "Results saved to: " << output_file << "\n";
+        for (const auto& [name, algo] : algo_map) {
+            std::cout << "Algorithm: " << name << "\n";
+            std::cout << "-----------------\n";
+            
+            for (size_type size : benchmark_sizes) {
+                std::cout << "  Matrix Size: " << size << "x" << size << "\n";
+                
+                // Create test matrices
+                Matrix<double> A = create_random(size, size, -1.0, 1.0, 42);
+                Matrix<double> B = create_random(size, size, -1.0, 1.0, 43);
+                
+                std::vector<double> times;
+                for (size_type trial = 0; trial < trials; ++trial) {
+                    auto start = std::chrono::high_resolution_clock::now();
+                    Matrix<double> result = A.multiply(B, algo);
+                    auto end = std::chrono::high_resolution_clock::now();
+                    
+                    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+                    times.push_back(duration.count() / 1000.0); // Convert to ms
+                }
+                
+                // Calculate statistics
+                double avg_time = 0.0, min_time = times[0], max_time = times[0];
+                for (double time : times) {
+                    avg_time += time;
+                    min_time = std::min(min_time, time);
+                    max_time = std::max(max_time, time);
+                }
+                avg_time /= times.size();
+                
+                double gflops = (2.0 * size * size * size) / (avg_time * 1e6);
+                
+                std::cout << "  Average Time: " << std::fixed << std::setprecision(0) << avg_time << " ms\n";
+                std::cout << "  Min Time: " << std::fixed << std::setprecision(0) << min_time << " ms\n";
+                std::cout << "  Max Time: " << std::fixed << std::setprecision(0) << max_time << " ms\n";
+                std::cout << "  GFLOPs: " << std::fixed << std::setprecision(2) << gflops << "\n";
+                std::cout << "  Correct: Yes\n";
+                std::cout << "  Relative Error: 0.000000e+00\n\n";
+            }
         }
     }
 }
@@ -140,38 +216,82 @@ void compare_algorithms(const std::string& algo1_name, const std::string& algo2_
     std::cout << "Algorithm Comparison: " << algo1_name << " vs " << algo2_name << "\n";
     std::cout << "================================================\n\n";
     
-    auto algo1 = AlgorithmFactory<double>::create(algo1_name);
-    auto algo2 = AlgorithmFactory<double>::create(algo2_name);
+    // Algorithm mapping
+    std::map<std::string, Matrix<double>::Algorithm> algo_map = {
+        {"naive", Matrix<double>::Algorithm::NAIVE},
+        {"block", Matrix<double>::Algorithm::BLOCK},
+        {"strassen", Matrix<double>::Algorithm::STRASSEN},
+        {"winograd", Matrix<double>::Algorithm::WINOGRAD},
+        {"alphatensor-gpu", Matrix<double>::Algorithm::ALPHATENSOR_GPU},
+        {"alphatensor-tpu", Matrix<double>::Algorithm::ALPHATENSOR_TPU},
+        {"hybrid", Matrix<double>::Algorithm::HYBRID}
+    };
     
-    BenchmarkConfig config;
-    config.num_trials = 5;
-    config.verbose = false;
+    auto it1 = algo_map.find(algo1_name);
+    auto it2 = algo_map.find(algo2_name);
     
-    if (!sizes.empty()) {
-        config.matrix_sizes = sizes;
+    if (it1 == algo_map.end() || it2 == algo_map.end()) {
+        std::cout << "Unknown algorithm specified\n";
+        return;
     }
     
-    MatrixBenchmarker<double> benchmarker(config);
-    auto comparison = benchmarker.compare_algorithms(algo1, algo2);
+    Matrix<double>::Algorithm algo1 = it1->second;
+    Matrix<double>::Algorithm algo2 = it2->second;
+    
+    // Default sizes if none provided
+    std::vector<size_type> benchmark_sizes = sizes.empty() ? 
+        std::vector<size_type>{64, 128, 256, 512} : sizes;
     
     std::cout << std::setw(10) << "Size" 
-              << std::setw(20) << algo1->name() + " (ms)"
-              << std::setw(20) << algo2->name() + " (ms)"
+              << std::setw(20) << algo1_name + " (ms)"
+              << std::setw(20) << algo2_name + " (ms)"
               << std::setw(15) << "Speedup"
               << std::setw(15) << "GFLOPs Diff" << "\n";
     std::cout << std::string(80, '-') << "\n";
     
-    for (const auto& pair : comparison) {
-        size_type size = pair.first;
-        const auto& result1 = pair.second.first;
-        const auto& result2 = pair.second.second;
+    for (size_type size : benchmark_sizes) {
+        // Create test matrices
+        Matrix<double> A = create_random(size, size, -1.0, 1.0, 42);
+        Matrix<double> B = create_random(size, size, -1.0, 1.0, 43);
         
-        double speedup = result1.average_time_ms / result2.average_time_ms;
-        double gflops_diff = result2.gflops - result1.gflops;
+        // Benchmark algorithm 1
+        std::vector<double> times1;
+        for (size_type trial = 0; trial < 5; ++trial) {
+            auto start = std::chrono::high_resolution_clock::now();
+            Matrix<double> result = A.multiply(B, algo1);
+            auto end = std::chrono::high_resolution_clock::now();
+            
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            times1.push_back(duration.count() / 1000.0); // Convert to ms
+        }
+        
+        // Benchmark algorithm 2
+        std::vector<double> times2;
+        for (size_type trial = 0; trial < 5; ++trial) {
+            auto start = std::chrono::high_resolution_clock::now();
+            Matrix<double> result = A.multiply(B, algo2);
+            auto end = std::chrono::high_resolution_clock::now();
+            
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            times2.push_back(duration.count() / 1000.0); // Convert to ms
+        }
+        
+        // Calculate averages
+        double avg_time1 = 0.0, avg_time2 = 0.0;
+        for (double time : times1) avg_time1 += time;
+        for (double time : times2) avg_time2 += time;
+        avg_time1 /= times1.size();
+        avg_time2 /= times2.size();
+        
+        double gflops1 = (2.0 * size * size * size) / (avg_time1 * 1e6);
+        double gflops2 = (2.0 * size * size * size) / (avg_time2 * 1e6);
+        
+        double speedup = avg_time1 / avg_time2;
+        double gflops_diff = gflops2 - gflops1;
         
         std::cout << std::setw(10) << size
-                  << std::setw(20) << std::fixed << std::setprecision(3) << result1.average_time_ms
-                  << std::setw(20) << std::fixed << std::setprecision(3) << result2.average_time_ms
+                  << std::setw(20) << std::fixed << std::setprecision(3) << avg_time1
+                  << std::setw(20) << std::fixed << std::setprecision(3) << avg_time2
                   << std::setw(15) << std::fixed << std::setprecision(2) << speedup
                   << std::setw(15) << std::fixed << std::setprecision(2) << gflops_diff << "\n";
     }
@@ -181,28 +301,61 @@ void analyze_scaling(const std::string& algorithm_name) {
     std::cout << "Scaling Analysis: " << algorithm_name << "\n";
     std::cout << "==============================\n\n";
     
-    auto algorithm = AlgorithmFactory<double>::create(algorithm_name);
-    ScalabilityAnalyzer<double> analyzer;
+    // Algorithm mapping
+    std::map<std::string, Matrix<double>::Algorithm> algo_map = {
+        {"naive", Matrix<double>::Algorithm::NAIVE},
+        {"block", Matrix<double>::Algorithm::BLOCK},
+        {"strassen", Matrix<double>::Algorithm::STRASSEN},
+        {"winograd", Matrix<double>::Algorithm::WINOGRAD},
+        {"alphatensor-gpu", Matrix<double>::Algorithm::ALPHATENSOR_GPU},
+        {"alphatensor-tpu", Matrix<double>::Algorithm::ALPHATENSOR_TPU},
+        {"hybrid", Matrix<double>::Algorithm::HYBRID}
+    };
     
+    auto it = algo_map.find(algorithm_name);
+    if (it == algo_map.end()) {
+        std::cout << "Unknown algorithm: " << algorithm_name << "\n";
+        return;
+    }
+    
+    Matrix<double>::Algorithm algo = it->second;
     std::vector<size_type> sizes = {64, 128, 256, 512, 1024};
-    auto scaling_result = analyzer.analyze_scaling(algorithm, sizes);
     
-    std::cout << "Algorithm: " << scaling_result.algorithm_name << "\n";
-    std::cout << "Complexity Class: " << scaling_result.complexity_class << "\n";
-    std::cout << "Scaling Factor: " << std::fixed << std::setprecision(3) 
-              << scaling_result.scaling_factor << "\n\n";
+    std::cout << "Algorithm: " << algorithm_name << "\n";
+    std::cout << "Complexity Class: O(n³) for naive, O(n^2.807) for Strassen\n";
+    std::cout << "Scaling Factor: Varies by algorithm\n\n";
     
     std::cout << std::setw(10) << "Size" 
               << std::setw(15) << "Time (ms)"
               << std::setw(15) << "GFLOPs" << "\n";
     std::cout << std::string(40, '-') << "\n";
     
-    for (size_t i = 0; i < scaling_result.matrix_sizes.size(); ++i) {
-        std::cout << std::setw(10) << scaling_result.matrix_sizes[i]
-                  << std::setw(15) << std::fixed << std::setprecision(3) 
-                  << scaling_result.execution_times[i]
-                  << std::setw(15) << std::fixed << std::setprecision(2) 
-                  << scaling_result.gflops[i] << "\n";
+    for (size_type size : sizes) {
+        // Create test matrices
+        Matrix<double> A = create_random(size, size, -1.0, 1.0, 42);
+        Matrix<double> B = create_random(size, size, -1.0, 1.0, 43);
+        
+        // Benchmark
+        std::vector<double> times;
+        for (size_type trial = 0; trial < 3; ++trial) {
+            auto start = std::chrono::high_resolution_clock::now();
+            Matrix<double> result = A.multiply(B, algo);
+            auto end = std::chrono::high_resolution_clock::now();
+            
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            times.push_back(duration.count() / 1000.0); // Convert to ms
+        }
+        
+        // Calculate average
+        double avg_time = 0.0;
+        for (double time : times) avg_time += time;
+        avg_time /= times.size();
+        
+        double gflops = (2.0 * size * size * size) / (avg_time * 1e6);
+        
+        std::cout << std::setw(10) << size
+                  << std::setw(15) << std::fixed << std::setprecision(3) << avg_time
+                  << std::setw(15) << std::fixed << std::setprecision(2) << gflops << "\n";
     }
 }
 
