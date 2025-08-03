@@ -14,7 +14,12 @@ BINDIR = bin
 BUILDDIR = build
 
 # Source files
-SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+SOURCES = $(wildcard $(SRCDIR)/*.cpp) \
+          $(wildcard $(SRCDIR)/core/*.cpp) \
+          $(wildcard $(SRCDIR)/prime/*.cpp) \
+          $(wildcard $(SRCDIR)/random/*.cpp) \
+          $(wildcard $(SRCDIR)/math/*.cpp) \
+          $(wildcard $(SRCDIR)/utils/*.cpp)
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
 
 # Target executable
@@ -37,6 +42,7 @@ $(TARGET): $(OBJECTS) | $(BINDIR)
 
 # Compile source files
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
 # Create directories

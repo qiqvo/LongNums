@@ -9,7 +9,7 @@
 #include <complex>  // std::complex
 #include <utility>  // std::swap
 #include <algorithm>  // std::max
-#include "random.h"
+#include "random/random.h"
 
 #define _USE_MATH_DEFINES
 #define PI 3.14159265358979323846

@@ -1,5 +1,5 @@
-#include "long.h"
-#include "real.h"
+#include "core/long.h"
+#include "core/real.h"
 
 const char* Real::delim_mant = ".";
 std::ostream & operator<<(std::ostream & stream, Real b) {

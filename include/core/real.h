@@ -1,5 +1,5 @@
 #pragma once
-#include "long.h"
+#include "core/long.h"
 
 class Real : public Long{
 	static const char* delim_mant;

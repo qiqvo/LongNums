@@ -18,21 +18,21 @@ find_package(Threads REQUIRED)
 # Source files
 set(SOURCES
     src/main.cpp
-    src/long.cpp
-    src/real.cpp
-    src/random.cpp
-    src/toomcook_mul.cpp
-    src/strassen_mul.cpp
-    src/math.cpp
-    src/prime_test.cpp
-    src/utils.cpp
+    src/core/long.cpp
+    src/core/real.cpp
+    src/random/random.cpp
+    src/math/toomcook_mul.cpp
+    src/math/strassen_mul.cpp
+    src/math/math.cpp
+    src/prime/prime_test.cpp
+    src/utils/utils.cpp
 )
 
 # Header files
 set(HEADERS
-    include/long.h
-    include/real.h
-    include/random.h
+    include/core/long.h
+    include/core/real.h
+    include/random/random.h
 )
 
 # Create executable

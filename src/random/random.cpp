@@ -1,4 +1,4 @@
-#include "random.h"
+#include "random/random.h"
 
 long long EvenlyGen::m = 3486784401;
 long long QuadConGen::a = 67867966;

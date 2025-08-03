@@ -90,19 +90,29 @@ LongNums/
 ├── BUILD_GUIDE.md         # Detailed build instructions
 ├── .gitignore             # Git ignore rules
 ├── include/               # Header files
-│   ├── long.h            # Long integer class
-│   ├── real.h            # Real number class
-│   └── random.h          # Random number generation
+│   ├── core/             # Core number classes
+│   │   ├── long.h        # Long integer class
+│   │   └── real.h        # Real number class
+│   ├── prime/            # Prime testing
+│   ├── random/           # Random number generation
+│   │   └── random.h      # Random number generation
+│   ├── math/             # Mathematical functions
+│   └── utils/            # Utility functions
 ├── src/                   # Source files
 │   ├── main.cpp          # Main program entry point
-│   ├── long.cpp          # Long integer implementation
-│   ├── real.cpp          # Real number implementation
-│   ├── random.cpp        # Random number generation
-│   ├── toomcook_mul.cpp  # Toom-Cook multiplication
-│   ├── strassen_mul.cpp  # Strassen multiplication
-│   ├── math.cpp          # Mathematical functions
-│   ├── prime_test.cpp    # Prime testing algorithms
-│   └── utils.cpp         # Utility functions
+│   ├── core/             # Core number implementations
+│   │   ├── long.cpp      # Long integer implementation
+│   │   └── real.cpp      # Real number implementation
+│   ├── prime/            # Prime testing algorithms
+│   │   └── prime_test.cpp # Prime testing algorithms
+│   ├── random/           # Random number generation
+│   │   └── random.cpp    # Random number generation
+│   ├── math/             # Mathematical functions and algorithms
+│   │   ├── math.cpp      # Mathematical functions
+│   │   ├── toomcook_mul.cpp # Toom-Cook multiplication
+│   │   └── strassen_mul.cpp # Strassen multiplication
+│   └── utils/            # Utility functions
+│       └── utils.cpp     # Utility functions
 └── tests/                # Test files
     └── test_basic.cpp    # Basic functionality tests
 ```
@@ -111,7 +121,7 @@ LongNums/
 
 ### Basic Arithmetic
 ```cpp
-#include "include/long.h"
+#include "core/long.h"
 
 Long a = "12345678901234567890";
 Long b = "98765432109876543210";
@@ -139,7 +149,7 @@ double rabin_result = prtest_RabinMiller(prime_candidate, 26);
 
 ### Loading Small Primes
 ```cpp
-#include "long.h"
+#include "core/long.h"
 
 // Load primes from external file
 auto small_primes = load_small_primes("data/small_primes.txt");
@@ -148,7 +158,7 @@ cout << "Loaded " << small_primes.size() << " primes up to " << small_primes.bac
 
 ### Real Numbers
 ```cpp
-#include "include/real.h"
+#include "core/real.h"
 
 Real a(1000, 1);  // Represents 0.1
 Real b(2000, 1);  // Represents 0.2
