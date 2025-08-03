@@ -59,7 +59,7 @@ int main() {
         double lehmann_result = prtest_Lehmann(prime_candidate, 80);     // 20 * 4
         double rabin_result = prtest_RabinMiller(prime_candidate, 80);   // 20 * 4
         
-        bool all_positive = (solovay_result > 0.5 && lehmann_result > 0.5 && rabin_result > 0.5);
+        bool all_positive = (solovay_result > 0 && lehmann_result > 0 && rabin_result > 0);
         cout << (all_positive ? "PASS" : "FAIL") << endl;
     }
     cout << endl;
@@ -75,8 +75,8 @@ int main() {
         double lehmann_result = prtest_Lehmann(composite, 20);     // 5 * 4
         double rabin_result = prtest_RabinMiller(composite, 20);   // 5 * 4
         
-        // For composites, we expect at least one test to return a low probability
-        bool likely_composite = (solovay_result < 0.5 || lehmann_result < 0.5 || rabin_result < 0.5);
+        // For composites, we expect at least one test to return a negative value (indicating composite)
+        bool likely_composite = (solovay_result < 0 || lehmann_result < 0 || rabin_result < 0);
         cout << (likely_composite ? "PASS" : "FAIL") << endl;
     }
     cout << endl;

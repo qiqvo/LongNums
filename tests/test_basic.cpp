@@ -70,7 +70,12 @@ int main() {
     // Test 7: Prime testing
     Long prime_candidate = 17;
     double solovay_result = prtest_SolovStras(prime_candidate, 10);
-    test.assert_equal(solovay_result > 0.5, true, "Solovay-Strassen test for prime number");
+    test.assert_equal(solovay_result > 0, true, "Solovay-Strassen test for prime number");
+    
+    // Test 8: Prime testing for 13
+    Long thirteen = 13;
+    double solovay_result_13 = prtest_SolovStras(thirteen, 10);
+    test.assert_equal(solovay_result_13 > 0, true, "Solovay-Strassen test for 13 (should be prime)");
     
     test.print_summary();
     
