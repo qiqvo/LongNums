@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cassert>
-#include "../include/Long.h"
-#include "../include/Real.h"
+#include "../include/long.h"
+#include "../include/real.h"
 
 // Simple test framework for LongNums
 class TestFramework {

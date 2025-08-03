@@ -1,6 +1,7 @@
 #include "long.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 std::vector<Long> load_small_primes(const std::string& filename) {
     std::vector<Long> primes;

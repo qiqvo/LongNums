@@ -23,7 +23,7 @@ public:
 	Real& operator=(const Real& other);
 	Real& operator=(Real&& other);
 
-	 operator std::string() const;
+	operator std::string() const;
 };
 
 std::ostream & operator<<(std::ostream & stream, Real b);

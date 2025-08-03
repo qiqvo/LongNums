@@ -38,7 +38,7 @@ protected:
 
 	void insert(ull v = 0);
 	Long insert(vector<ull>);
-	virtual Long normal();
+	Long normal();
 
 	vector<ull> a;   // 2383597  --->   a == { 7 , 9 , 5 , 3 ... 2 }
 	static const ull karacnaive;
@@ -114,7 +114,7 @@ public:
 
 	virtual operator std::string() const;
 
-	~Long();
+	virtual ~Long();
 };
 
 const auto null = Long(0);

@@ -21,14 +21,8 @@ set(SOURCES
     src/long.cpp
     src/real.cpp
     src/random.cpp
-    src/sum.cpp
-    src/mult.cpp
-    src/operators.cpp
-    src/compare.cpp
-    src/karatsuba_mul.cpp
     src/toomcook_mul.cpp
     src/strassen_mul.cpp
-    src/division_inverse.cpp
     src/math.cpp
     src/prime_test.cpp
     src/utils.cpp
@@ -36,9 +30,9 @@ set(SOURCES
 
 # Header files
 set(HEADERS
-    include/Long.h
-    include/Real.h
-    include/Random.h
+    include/long.h
+    include/real.h
+    include/random.h
 )
 
 # Create executable
