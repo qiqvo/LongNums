@@ -93,24 +93,24 @@ public:
 	Long operator=(const vector<ull>& x); // dangerous!
 
 public:
-	Long(const Long &o);
-	Long(Long &&o);
-	Long& operator=(const Long& o);
-	Long& operator=(Long&& o);
+	Long(const Long &other);
+	Long(Long &&other);
+	Long& operator=(const Long& other);
+	Long& operator=(Long&& other);
 
-	virtual Long operator+(const Long& o) const;
-	virtual Long operator-(const Long& o) const;
-	virtual Long operator*(const Long& o) const;
-	Long operator/(const int o)   const;
-	Long operator/(const Long& o) const;
-	Long operator%(const Long& o) const;
+	virtual Long operator+(const Long& other) const;
+	virtual Long operator-(const Long& other) const;
+	virtual Long operator*(const Long& other) const;
+	Long operator/(const int other)   const;
+	Long operator/(const Long& other) const;
+	Long operator%(const Long& other) const;
 
-	bool operator<(const Long& o)  const;
-	bool operator>(const Long& o)  const;
-	bool operator<=(const Long& o) const;
-	bool operator>=(const Long& o) const;
-	bool operator==(const Long& o) const;
-	bool operator!=(const Long& o) const;
+	bool operator<(const Long& other)  const;
+	bool operator>(const Long& other)  const;
+	bool operator<=(const Long& other) const;
+	bool operator>=(const Long& other) const;
+	bool operator==(const Long& other) const;
+	bool operator!=(const Long& other) const;
 
 	virtual operator std::string() const;
 
@@ -150,3 +150,6 @@ Long Jacobi(Long& a, Long& b);
 
 std::string my_to_string(const ull& a, const int base);
 Long to_Long(const Real& a);
+
+// Utility function to read small primes from file
+std::vector<Long> load_small_primes(const std::string& filename = "data/small_primes.txt");

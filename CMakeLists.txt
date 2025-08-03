@@ -31,6 +31,7 @@ set(SOURCES
     src/Division_Inverse.cpp
     src/Math.cpp
     src/Prime_Test.cpp
+    src/Utils.cpp
 )
 
 # Header files

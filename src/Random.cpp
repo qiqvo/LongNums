@@ -5,15 +5,15 @@ long long QuadConGen::a = 67867966;
 long long QuadConGen::c = 104395301;
 long long QuadConGen::d = 92526;
 
-GeneratorGeneral::GeneratorGeneral(long ssd) :
-	_seed(ssd) { }
-EvenlyGen::EvenlyGen(long ssd) : GeneratorGeneral(ssd)
+GeneratorGeneral::GeneratorGeneral(long seed) :
+	_seed(seed) { }
+EvenlyGen::EvenlyGen(long seed) : GeneratorGeneral(seed)
 {}
 double EvenlyGen::random()
 {
 	return (randomL() + 0.0) / m;
 }
-QuadConGen::QuadConGen(long ssd) : EvenlyGen(ssd)
+QuadConGen::QuadConGen(long seed) : EvenlyGen(seed)
 {
 	_random = _seed;
 	randomL();

@@ -156,6 +156,15 @@ double lehmann_result = prtest_Lehmann(prime_candidate, 26);
 double rabin_result = prtest_RabinMiller(prime_candidate, 26);
 ```
 
+### Loading Small Primes
+```cpp
+#include "Long.h"
+
+// Load primes from external file
+auto small_primes = load_small_primes("data/small_primes.txt");
+cout << "Loaded " << small_primes.size() << " primes up to " << small_primes.back() << endl;
+```
+
 ### Real Numbers
 ```cpp
 #include "include/Real.h"

@@ -4,7 +4,7 @@ class GeneratorGeneral
 {
 public:
 
-	GeneratorGeneral(long ssd = 0);
+	GeneratorGeneral(long seed = 0);
 
 protected:
 	virtual long long randomL() = 0;
@@ -16,7 +16,7 @@ protected:
 
 class EvenlyGen : public GeneratorGeneral {
 public:
-	EvenlyGen(long ssd = 0);
+	EvenlyGen(long seed = 0);
 
 	virtual double random();
 
@@ -34,5 +34,5 @@ class QuadConGen : public EvenlyGen
 						// m == 3**20
 public:
 	long long randomL();
-	QuadConGen(long ssd = 0);
+	QuadConGen(long seed = 0);
 };

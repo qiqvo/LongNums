@@ -42,27 +42,27 @@ Long::~Long()
 	clear();
 }
 
-Long::Long(const Long & o)
+Long::Long(const Long & other)
 {
-	operator=(o);
+	operator=(other);
 }
-Long::Long(Long && o)
+Long::Long(Long && other)
 {
-	operator=(o);
+	operator=(other);
 }
-Long & Long::operator=(const Long & o)
+Long & Long::operator=(const Long & other)
 {
 	clear();
-	a = o.a;
-	sign = o.sign;
+	a = other.a;
+	sign = other.sign;
 	return *this;
 }
-Long & Long::operator=(Long && o)
+Long & Long::operator=(Long && other)
 {
 	clear();
-	a = o.a;
-	sign = o.sign;
-	o.clear();
+	a = other.a;
+	sign = other.sign;
+	other.clear();
 	return *this;
 }
 

@@ -11,7 +11,7 @@ Real::operator std::string() const {
 	if (!sign) s += "-";
 
 	int i = size() - 1, j = real_size();
-	int q = mantisa_place;
+	int q = mantissa_place;
 	if (q >= j) {
 		--q;
 		s += "0" + std::string(delim_mant);
@@ -23,9 +23,9 @@ Real::operator std::string() const {
 	else {
 		s += std::to_string(a[i--]);
 		while (i >= 0) {
-			if (j > static_cast<int>(mantisa_place))
+			if (j > static_cast<int>(mantissa_place))
 				for (auto tmp = 0; tmp < static_cast<int>(bs); ++tmp) {
-					if (j - tmp == static_cast<int>(mantisa_place))
+					if (j - tmp == static_cast<int>(mantissa_place))
 						s += std::string(delim_mant);
 				}
 			else 
@@ -38,7 +38,7 @@ Real::operator std::string() const {
 }
 Real Real::normalmant()
 {
-	if (mantisa_place == 0)
+	if (mantissa_place == 0)
 		return *this;
 	// int bs = std::log10(base);  // Unused variable removed
 	vector<ull> vec;
@@ -59,36 +59,36 @@ Real Real::normalmant()
 Real Real::cut(uint t)
 {
 	if (size() >= t) {
-		mantisa_place -= (size() - t) * bs;
+		mantissa_place -= (size() - t) * bs;
 		a.erase(a.begin(), a.end() - t);
 	}
 	return *this;
 }
 
-Real::Real(const Long & p1, uint m) : Long(p1), mantisa_place(m) {
+Real::Real(const Long & value, uint m) : Long(value), mantissa_place(m) {
 	normalmant();
 }
 
-Real Real::operator+(const Real & o) const
+Real Real::operator+(const Real & other) const
 {
-	bool mmant = mantisa_place > o.mantisa_place;
-	Long p1 = (mmant) ? *this : o;
-	Long p2 = (mmant) ? o : *this;
+	bool mmant = mantissa_place > other.mantissa_place;
+	Long p1 = (mmant) ? *this : other;
+	Long p2 = (mmant) ? other : *this;
 
-	auto m1 = mmant ? mantisa_place : o.mantisa_place;
-	auto m2 = mmant ? o.mantisa_place : mantisa_place;
+	auto m1 = mmant ? mantissa_place : other.mantissa_place;
+	auto m2 = mmant ? other.mantissa_place : mantissa_place;
 	p1 = p1 + p2.shift(m1 - m2);
 	Real p3 = static_cast<Real>(p1);
-	p3.mantisa_place = m1;
+	p3.mantissa_place = m1;
 	return p3.normalmant();
 }
-Real Real::operator-(const Real & o) const {
-	bool mmant = mantisa_place > o.mantisa_place;
-	Long p1 = (mmant) ? *this : o;
-	Long p2 = (mmant) ? o : *this;
+Real Real::operator-(const Real & other) const {
+	bool mmant = mantissa_place > other.mantissa_place;
+	Long p1 = (mmant) ? *this : other;
+	Long p2 = (mmant) ? other : *this;
 
-	auto m1 = mmant ? mantisa_place : o.mantisa_place;
-	auto m2 = mmant ? o.mantisa_place : mantisa_place;
+	auto m1 = mmant ? mantissa_place : other.mantissa_place;
+	auto m2 = mmant ? other.mantissa_place : mantissa_place;
 	// int bs = std::log10(base);  // Unused variable removed
 	auto t10 = 0; auto t = p2[0];
 	while (t % 10 == 0) {
@@ -98,46 +98,46 @@ Real Real::operator-(const Real & o) const {
 	int shifting = (m1 - m2 + t10);
 	p1 = mmant ? (p1 - p2.shiftback(shifting)) : (p2.shiftback(shifting) - p1);
 	Real p3 = static_cast<Real>(p1);
-	p3.mantisa_place = m1;       // x(n+1) = xn(2 - b * xn)
+	p3.mantissa_place = m1;       // x(n+1) = xn(2 - b * xn)
 	return p3.normalmant();
 }
-Real Real::operator*(const Real & o) const {
-	Long p1 = Long(*this) * Long(o);
+Real Real::operator*(const Real & other) const {
+	Long p1 = Long(*this) * Long(other);
 	Real p2 = static_cast<Real>(p1);
-	p2.mantisa_place = mantisa_place + o.mantisa_place;
+	p2.mantissa_place = mantissa_place + other.mantissa_place;
 	return p2.normalmant();
 }
 
-Real::Real(const Real & o) : Long(o)
+Real::Real(const Real & other) : Long(other)
 {
-	operator=(o);
+	operator=(other);
 }
 
-Real::Real(Real && o)
+Real::Real(Real && other)
 {
-	operator=(o);
+	operator=(other);
 }
 
-Real & Real::operator=(const Real & o)
+Real & Real::operator=(const Real & other)
 {
-	mantisa_place = o.mantisa_place;
+	mantissa_place = other.mantissa_place;
 	clear();
-	for (auto i : o.a) {
+	for (auto i : other.a) {
 		a.push_back(i);
 	}
-	sign = o.sign;
-	mantisa_place = o.mantisa_place;
+	sign = other.sign;
+	mantissa_place = other.mantissa_place;
 	return *this;
 }
 
-Real & Real::operator=(Real && o) {
+Real & Real::operator=(Real && other) {
 	clear();
-	for (auto i : o.a) {
+	for (auto i : other.a) {
 		a.push_back(i);
 	}
-	sign = o.sign;
-	mantisa_place = o.mantisa_place;
-	o.clear();
+	sign = other.sign;
+	mantissa_place = other.mantissa_place;
+	other.clear();
 	return *this;
 }
 Long to_Long(const Real & a)
