@@ -1,19 +1,40 @@
-# Build directories
-build/
+# =============================================================================
+# AlphaTensor C++ Matrix Multiplication - Git Ignore Rules
+# =============================================================================
+# 
+# This .gitignore is configured to:
+# 1. Allow build recipes (Makefile, CMakeLists.txt) to be committed
+# 2. Ignore compiled objects, cache files, and executables
+# 3. Protect personal paths and sensitive information
+# 4. Ignore temporary and generated files
+# 
+# To protect your personal paths, uncomment and modify the patterns below:
+# /Users/*/Workspace/
+# /home/*/projects/
+# C:/Users/*/Documents/
+
+# Build directories - allow build/ but ignore specific generated files
+# build/  # Commented out to allow build directory
 build-*/
 cmake-build-*/
 out/
 dist/
 
-# CMake generated files
+# CMake generated files - allow build recipes, ignore cache and objects
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
+# Makefile  # Allow Makefile (build recipe)
 *.cmake
 !CMakeLists.txt
 
-# Compiled Object files
+# Ignore Makefiles that contain personal paths
+**/Makefile
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/CMakeFiles/
+
+# Compiled Object files - ignore all compiled objects
 *.slo
 *.lo
 *.o
@@ -34,11 +55,12 @@ Makefile
 *.a
 *.lib
 
-# Executables
+# Executables - ignore compiled binaries, allow build recipes
 *.exe
 *.out
 *.app
 test_simple
+alphatensor_cpp
 
 # Debug files
 *.dSYM/
@@ -98,10 +120,10 @@ venv.bak/
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 
-# Benchmark results
+# Benchmark results - allow some results, ignore others
 benchmark_results/
-*.csv
-*.json
+# *.csv  # Commented out to allow CSV results
+# *.json  # Commented out to allow JSON results
 !example_results.csv
 
 # Large data files
@@ -132,6 +154,15 @@ benchmark_results/
 config.local
 settings.local
 .env.local
+
+# Personal paths protection (add your specific paths here)
+# /Users/*/Workspace/
+# /home/*/projects/
+# C:/Users/*/Documents/
+
+# Specific personal path protection (uncomment and modify as needed)
+# /Users/benjamin.povar/Workspace/
+# /Users/*/Workspace/FMM-fast-matrix-multiply/
 
 # Dependencies (if using package managers)
 vendor/

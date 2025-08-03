@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.16)
 project(AlphaTensorCpp VERSION 1.0.0 LANGUAGES CXX)
 
+# Use relative paths when possible
+set(CMAKE_USE_RELATIVE_PATHS ON)
+
+# Set source and binary directories to be relative
+set(CMAKE_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
