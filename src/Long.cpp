@@ -1,19 +1,19 @@
-﻿#include "real.h"
-#include "long.h"
+﻿#include "long.h"
+#include "real.h"
 #include <fstream>
-#include <time.h>    // time
-//#include <thread>
-//#include <future>
-//#include <stdexcept>   // for logic error
+#include <time.h>
+#include <stdexcept>
 
 std::ostream & operator<<(std::ostream & stream, Long b) {
 	stream << b.operator std::string();
 	return stream;
 }
+
 inline std::string my_to_string(const ull& a, const int base)
 {
 	std::string s = "";
-	auto b = base; auto sz = 0;
+	auto b = base; 
+	auto sz = 0;
 	while (b != 1) {
 		b = b / 10;
 		++sz;
@@ -22,7 +22,8 @@ inline std::string my_to_string(const ull& a, const int base)
 	std::string q = std::to_string(a);
 	auto ssz = q.size();
 	while (static_cast<int>(ssz) != sz){
-		s += "0"; ++ssz;
+		s += "0"; 
+		++ssz;
 	}
     s += std::to_string(a);
 
@@ -47,10 +48,12 @@ Long::Long(const Long & other)
 {
 	operator=(other);
 }
+
 Long::Long(Long && other)
 {
 	operator=(other);
 }
+
 Long & Long::operator=(const Long & other)
 {
 	clear();
@@ -58,6 +61,7 @@ Long & Long::operator=(const Long & other)
 	sign = other.sign;
 	return *this;
 }
+
 Long & Long::operator=(Long && other)
 {
 	clear();
@@ -81,15 +85,18 @@ uint Long::size() const
 {
 	return (uint)a.size();
 }
+
 uint Long::real_size() const{
 	int t = std::log10(a.back());
 	return (uint)(a.size())*bs - (bs - ((a.back() != 0) ? t + 1 : 0));
 }
+
 ull Long::operator[](int i) const
 {
 	if (i >= static_cast<int>(size())) return 0;
 	return a[i];
 }
+
 ull Long::get_char(uint i) const{
 	auto f = [](ull num, int i) -> int {
 		auto j = 0;
@@ -105,6 +112,7 @@ ull Long::get_char(uint i) const{
 	int temp_i = i % bs;
 	return f(a[i / bs], temp_i);
 }
+
 void Long::print(std::ostream & stream) const
 {
 	for (int i = size() - 1; i >= 0; --i) {
@@ -142,6 +150,7 @@ void Long::insert(ull v)
 {
 	a.push_back(v);
 }
+
 Long Long::insert(vector<ull> x)
 {
 	a.insert(a.cbegin(), x.cbegin(), x.cend());
@@ -157,10 +166,12 @@ Long Long::shift(uint n)
 	}
 	return *this;
 }
+
 Long Long::shiftaccurate(uint n)
 {
 	while (n > bs) {
-		shift(1); n -= bs;
+		shift(1); 
+		n -= bs;
 	}
 	while (n != 0) {
 		a[0] *= 10;
@@ -168,15 +179,18 @@ Long Long::shiftaccurate(uint n)
 	}
 	return normal();
 }
+
 Long Long::shiftback(uint n)
 {
 	while (n > bs) {
-		shift(1); n -= bs;
+		shift(1); 
+		n -= bs;
 	}
 	a.emplace(a.begin(), (ull)0);
 
 	return normal();
 }
+
 Long Long::changeSign(int b)
 {
 	if (b == 1) sign = 1;
@@ -215,6 +229,7 @@ Long Long::normal()
 	return *this;
 }
 
+// Constructors
 Long::Long(uint v)
 {
 	operator=(v);
@@ -255,6 +270,7 @@ Long::Long(const vector<ull>& x)
 	operator=(x);
 }
 
+// Assignment operators
 Long Long::operator=(uint v)
 {
 	return operator=((ull)v);
@@ -307,7 +323,8 @@ Long Long::set(ull v, bool s)
 Long Long::operator=(const char* v)
 {
 	clear();
-	ull e = 0; uint size = 0;
+	ull e = 0; 
+	uint size = 0;
 	while (*(v++)) ++size;
 	if (size == 0)
 		return null;
@@ -339,7 +356,8 @@ Long Long::operator=(const char* v)
 		}
 		else {
 			insert(e);
-			e = 0; b = 1;
+			e = 0; 
+			b = 1;
 		}
 	}
 	if(e != 0)
@@ -485,10 +503,8 @@ bool Long::operator>=(const Long & other) const
 	}
 	else return false;
 }
-#include "long.h"
- 
- 
 
+// Arithmetic operations
 Long Long::sum(const Long& b) const
 {
 	int fl = b.sign;
@@ -556,15 +572,12 @@ Long Long::neg(const Long & b) const
 
 			throw std::logic_error("bye from minus ver2");
 		}
-		//return null;
 	}
 
 	return c.normal();
 }
 
-#include "long.h"
-#include "real.h"
- 
+// Binary search template for division
 template <class T>
 T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r);
 
@@ -586,7 +599,7 @@ Long Long::mul(const Long& b) const
 Long Long::divide(const int b, Long& rem) const
 {
 	if (b == 0 || size() == 0)
-		throw "Division by zero!";
+		throw std::runtime_error("Division by zero!");
 
 	auto t = b;
 	ull c = 0;
@@ -605,10 +618,11 @@ Long Long::divide(const int b, Long& rem) const
 	rem = c;
 	return r.normal().changeSign(fl);
 }
+
 Long Long::divide(const Long & b, Long& rem) const
 {
 	if (size() == 0 || b.size() == 0 || b == 0)
-		throw "Division by zero!";
+		throw std::runtime_error("Division by zero!");
 	else if ((size() == 1 && a[0] == 0))
 		return 0;
 	else if (size() < b.size() || *this < b) {
@@ -627,10 +641,11 @@ Long Long::divide(const Long & b, Long& rem) const
 		t.changeSign();
 	}
 
-	Long r(vector<ull>(size(), 0)); Long c;
-	// ull tmp = 0;  // Unused variable removed
+	Long r(vector<ull>(size(), 0)); 
+	Long c;
 	for (int i = size() - 1; i >= 0; i--) {
-		c.shift(); c.set(0, a[i]);
+		c.shift(); 
+		c.set(0, a[i]);
 		ull tmp = 0;
 		if (c.size() >= b.size() && (c >= b)) {
 			if (c == b) {
@@ -653,6 +668,7 @@ Long Long::divide(const Long & b, Long& rem) const
 	rem = c.normal();
 	return r.normal().changeSign(fl);
 }
+
 template <class T>
 T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r) {
 	auto l = _l, r = _r;
@@ -677,7 +693,7 @@ T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r) {
 Long Long::divide2(const Long & b, Long& rem) const
 {
 	if (size() == 0 || b.size() == 0 || b == 0)
-		throw "Division by zero!";
+		throw std::runtime_error("Division by zero!");
 	else if ((size() == 1 && a[0] == 0))
 		return 0;
 	else if (size() < b.size() || *this < b) {
@@ -697,7 +713,6 @@ Long Long::divide2(const Long & b, Long& rem) const
 	}
 
 	Long r, c;
-	// ull tmp = 0;  // Unused variable removed
 	r = binsearch(*this, b, c, null, *this);
 	c = *this - r;
 	if (c == null)
@@ -709,7 +724,6 @@ Long Long::divide2(const Long & b, Long& rem) const
 
 Long Long::mult_inv(const Long& b) const
 {
-	// int fl = (sign * b.sign);  // Unused variable removed
 	Long tmp;
 	int len = size() + b.size() - 1;
 	if (len <= 0) return null;
@@ -721,7 +735,6 @@ Long Long::mult_inv(const Long& b) const
 	}
 	return to_Long(_b * *this);
 }
-
 
 Long Long::karac_mul(const Long & b) const
 {
@@ -758,26 +771,23 @@ Long Long::karac_mul(const Long & b) const
 
 	Long xlyl = xl.karac_mul(yl);
 	Long xryr = xr.karac_mul(yr);
-	// Long xxyy = (xl + xr).karac_mul(yl + yr) - (xlyl + xryr);
 
 	return (Long().insert(xlyl.a).insert(vector<ull>(2 * k, 0)) + xryr 
 		+ ((xl + xr).karac_mul(yl + yr) - (xlyl + xryr)).insert(vector<ull>(k, 0))).changeSign(fl);
 }
-
 
 Real inverse(const Long& a, uint iterations) {
 	auto rs = a.real_size() + 1;
 	Real approx(Long((ull)std::pow(10, (rs > Long::bs) ? Long::bs - rs % Long::bs : rs)), rs);
 	const Real two = Real(Long(2), 0);
 	const Real th = Real(a, 0);
-	//std::cout << -1 << "   " << approx << std::endl;
+	
 	for (uint i = 0, count = 0; i < iterations; ++i, ++count) {
 		approx = approx * (two - approx * th);
 		if (count == 6) {
 			count = 0;
 			approx.cut(rs + 5);
 		}
-	//	std::cout << i << "   " << approx << std::endl;
 	}
 	return approx.cut();
 }
