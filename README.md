@@ -2,6 +2,62 @@
 
 A C++ library for long number arithmetic with multiple multiplication algorithms and prime testing capabilities.
 
+## Quick Start
+
+### Prerequisites
+- C++17 compatible compiler (GCC 7+, Clang 5+, or MSVC 2017+)
+- CMake 3.16+ (for CMake build)
+- Make (for Makefile build)
+- pthread library (usually included with compiler)
+
+### Build and Run
+
+**Option 1: Using the build script (Recommended)**
+```bash
+# Build and run in one command
+./build.sh run
+
+# Build release version
+./build.sh release
+
+# Build debug version
+./build.sh debug
+```
+
+**Option 2: Using CMake**
+```bash
+# Create build directory and configure
+mkdir build && cd build
+cmake ..
+
+# Build
+make
+
+# Run
+./bin/LongNums
+```
+
+**Option 3: Using Makefile**
+```bash
+# Build release version
+make
+
+# Build debug version
+make debug
+
+# Run the program
+make run
+```
+
+**Option 4: Direct compilation**
+```bash
+# Simple compilation
+g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
+
+# Run
+./LongNums
+```
+
 ## Features
 
 ### Multiplication Algorithms
@@ -31,7 +87,7 @@ LongNums/
 ├── Makefile               # Traditional Makefile
 ├── build.sh               # Convenient build script
 ├── README.md              # Project documentation
-├── BUILD_GUIDE.md         # Build instructions
+├── BUILD_GUIDE.md         # Detailed build instructions
 ├── .gitignore             # Git ignore rules
 ├── include/               # Header files
 │   ├── long.h            # Long integer class
@@ -42,95 +98,20 @@ LongNums/
 │   ├── long.cpp          # Long integer implementation
 │   ├── real.cpp          # Real number implementation
 │   ├── random.cpp        # Random number generation
-│   ├── karatsuba_mul.cpp # Karatsuba multiplication
 │   ├── toomcook_mul.cpp  # Toom-Cook multiplication
 │   ├── strassen_mul.cpp  # Strassen multiplication
-│   ├── sum.cpp           # Addition operations
-│   ├── mult.cpp          # Basic multiplication
-│   ├── operators.cpp     # Arithmetic operators
-│   ├── compare.cpp       # Comparison operations
-│   ├── division_inverse.cpp # Division operations
 │   ├── math.cpp          # Mathematical functions
-│   └── prime_test.cpp    # Prime testing algorithms
+│   ├── prime_test.cpp    # Prime testing algorithms
+│   └── utils.cpp         # Utility functions
 └── tests/                # Test files
     └── test_basic.cpp    # Basic functionality tests
-```
-
-## Build Instructions
-
-### Prerequisites
-- C++17 compatible compiler (GCC 7+, Clang 5+, or MSVC 2017+)
-- CMake 3.16+ (for CMake build)
-- Make (for Makefile build)
-- pthread library (usually included with compiler)
-
-### Using CMake (Recommended)
-
-```bash
-# Create build directory
-mkdir build && cd build
-
-# Configure and build
-cmake ..
-make
-
-# Run the program
-./bin/LongNums
-```
-
-### Using Makefile
-
-```bash
-# Build release version
-make
-
-# Build debug version
-make debug
-
-# Build optimized release
-make release
-
-# Run the program
-make run
-
-# Clean build artifacts
-make clean
-```
-
-### Using Build Script
-
-```bash
-# Build and run
-./build.sh run
-
-# Build release version
-./build.sh release
-
-# Build debug version
-./build.sh debug
-
-# Clean build artifacts
-./build.sh clean
-```
-
-### Direct Compilation
-
-```bash
-# Simple compilation
-g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
-
-# With debug symbols
-g++ -std=c++17 -g -DDEBUG -pthread -Iinclude src/*.cpp -o LongNums
-
-# With maximum optimization
-g++ -std=c++17 -O3 -DNDEBUG -pthread -Iinclude src/*.cpp -o LongNums
 ```
 
 ## Usage Examples
 
 ### Basic Arithmetic
 ```cpp
-#include "include/Long.h"
+#include "include/long.h"
 
 Long a = "12345678901234567890";
 Long b = "98765432109876543210";
@@ -158,7 +139,7 @@ double rabin_result = prtest_RabinMiller(prime_candidate, 26);
 
 ### Loading Small Primes
 ```cpp
-#include "Long.h"
+#include "long.h"
 
 // Load primes from external file
 auto small_primes = load_small_primes("data/small_primes.txt");
@@ -167,7 +148,7 @@ cout << "Loaded " << small_primes.size() << " primes up to " << small_primes.bac
 
 ### Real Numbers
 ```cpp
-#include "include/Real.h"
+#include "include/real.h"
 
 Real a(1000, 1);  // Represents 0.1
 Real b(2000, 1);  // Represents 0.2
@@ -195,6 +176,51 @@ g++ -std=c++17 -Iinclude tests/test_basic.cpp src/*.cpp -o test_basic
 
 The Strassen multiplication algorithm uses multi-threading for parallel computation. The number of threads can be controlled by the system's thread pool.
 
+## Troubleshooting
+
+### Common Issues
+
+1. **"nproc: command not found"** (macOS)
+   - The build script automatically uses `sysctl -n hw.ncpu` on macOS
+
+2. **Threading compilation errors**
+   - Most threading issues are resolved in the current version
+
+3. **Include path issues**
+   - Make sure to use `-Iinclude` flag when compiling directly
+   - Build systems handle this automatically
+
+### Platform-Specific Notes
+
+**macOS:**
+- Uses AppleClang compiler
+- pthread is included by default
+
+**Linux:**
+- Uses GCC or Clang
+- pthread library required
+
+**Windows:**
+- Requires MSVC or MinGW
+- pthread library may need to be installed separately
+
+## Build Script Options
+
+The `build.sh` script provides a convenient interface for all build operations:
+
+```bash
+./build.sh [OPTION]
+
+Options:
+  debug         - Build with CMake in debug mode
+  release       - Build with CMake in release mode (default)
+  make-debug    - Build with Makefile in debug mode
+  make-release  - Build with Makefile in release mode
+  clean         - Clean all build artifacts
+  run           - Run the program
+  help          - Show help message
+```
+
 ## License
 
 This project appears to be an educational implementation for long number arithmetic algorithms.
@@ -202,3 +228,5 @@ This project appears to be an educational implementation for long number arithme
 ## Contributing
 
 This appears to be a lab/educational project. For educational purposes, feel free to study and modify the code to understand the algorithms better.
+
+For detailed build instructions, see [BUILD_GUIDE.md](BUILD_GUIDE.md).
