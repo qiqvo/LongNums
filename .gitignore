@@ -1,0 +1,138 @@
+# Build directories
+build/
+build-*/
+cmake-build-*/
+out/
+dist/
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+test_simple
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.backup
+
+# Test results and coverage
+*.gcov
+*.gcda
+*.gcno
+coverage/
+htmlcov/
+.coverage
+
+# Documentation build
+docs/_build/
+docs/build/
+
+# Python (if any scripts are used)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Benchmark results
+benchmark_results/
+*.csv
+*.json
+!example_results.csv
+
+# Large data files
+*.dat
+*.bin
+*.h5
+*.hdf5
+
+# Profiling data
+*.prof
+*.perf
+
+# Memory dumps
+*.core
+*.dump
+
+# Package files
+*.tar.gz
+*.zip
+*.rar
+
+# Backup files
+*~
+*.orig
+*.rej
+
+# Local configuration
+config.local
+settings.local
+.env.local
+
+# Dependencies (if using package managers)
+vendor/
+node_modules/ 
