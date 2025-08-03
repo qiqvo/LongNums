@@ -55,7 +55,7 @@ void fft::trans(vector<ReIm>& a, bool inv)
 	uint n = a.size();
 
 	for (uint i = 0; i < n; ++i)
-		if (i < (*rev)[i])
+		if (i < static_cast<uint>((*rev)[i]))
 			swap(a[i], a[(*rev)[i]]);
 
 	for (uint len = 2; len <= n; len <<= 1) {
@@ -93,7 +93,7 @@ void fft::calc_rev(vector<int> &_rev, int n) {
 	uint log_n = 0;
 	while ((1 << log_n) < n)  ++log_n;
 
-	for (uint i = 0; i < n; ++i) {
+	for (uint i = 0; i < static_cast<uint>(n); ++i) {
 		(*rev)[i] = 0;
 		for (uint j = 0; j < log_n; ++j)
 			if (i & (1 << j))

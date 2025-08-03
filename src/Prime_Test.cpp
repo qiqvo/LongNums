@@ -153,7 +153,7 @@ double prtest_RabinMiller(const Long & p, ull iter)
 		Long counter = null;
 		for (uint i = 0; i < p.size(); ++i) {
 			auto t = p[i];
-			while (t && t & 1 == 0) {
+			while (t && (t & 1) == 0) {
 				t >>= 1; counter = counter + 1;
 			}
 			if (t != 0) break;

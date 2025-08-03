@@ -22,7 +22,7 @@ Long Long::karac_mul(const Long & b) const
 	static auto f = [](Long& wh, const Long& what, int k, int mode) {
 		if (mode == 1)
 			mode = k;
-		for (uint i = mode; i < k + mode && i < what.size(); ++i) {
+		for (uint i = mode; i < static_cast<uint>(k + mode) && i < static_cast<uint>(what.size()); ++i) {
 			wh.a[i - mode] = what[i];
 		}
 		wh.normal();

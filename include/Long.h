@@ -133,7 +133,7 @@ std::ostream & operator<<(std::ostream & stream, Long b);
 
 Long rand(const uint s);
 Long rand(const uint s, const Long &c,
-    bool(*condition)(const Long& a, const Long& b) = [](auto& a, auto& b) { return true; });
+    bool(*condition)(const Long& a, const Long& b) = [](auto& a, auto& b) { (void)a; (void)b; return true; });
 
 Real inverse(const Long& a, uint iterations = 15);
 Long abs(const Long& a);

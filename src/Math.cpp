@@ -34,7 +34,7 @@ Long factorial(const Long & N)
 {
     auto n = N;
     auto ns = n - 1;
-    for (ns; ns > 0; ns = ns - 1) {
+    	for (; ns > 0; ns = ns - 1) {
         n = n * ns;
     }
     return n;

@@ -20,7 +20,7 @@ inline std::string my_to_string(const ull& a, const int base)
 
 	std::string q = std::to_string(a);
 	auto ssz = q.size();
-	while (ssz != sz){
+	while (static_cast<int>(ssz) != sz){
 		s += "0"; ++ssz;
 	}
     s += std::to_string(a);
@@ -86,7 +86,7 @@ uint Long::real_size() const{
 }
 ull Long::operator[](int i) const
 {
-	if (i >= size()) return 0;
+	if (i >= static_cast<int>(size())) return 0;
 	return a[i];
 }
 ull Long::get_char(uint i) const{
@@ -101,7 +101,8 @@ ull Long::get_char(uint i) const{
 		}
 		return -1;
 	};
-	return f(a[i / bs], i = i%bs);
+	int temp_i = i % bs;
+	return f(a[i / bs], temp_i);
 }
 void Long::print(std::ostream & stream) const
 {
@@ -331,7 +332,7 @@ Long Long::operator=(const char* v)
 	int i = size - 1 - lb;
 
 	while(i >= 0 && v[i]) {
-		if (b < base) {
+		if (b < static_cast<int>(base)) {
 			e += (v[i--] - '0') * b;
 			b = b * 10;
 		}

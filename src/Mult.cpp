@@ -64,10 +64,10 @@ Long Long::divide(const Long & b, Long& rem) const
 	}
 
 	Long r(vector<ull>(size(), 0)); Long c;
-	ull tmp = 0;
+	// ull tmp = 0;  // Unused variable removed
 	for (int i = size() - 1; i >= 0; i--) {
 		c.shift(); c.set(0, a[i]);
-		tmp = 0;
+		ull tmp = 0;
 		if (c.size() >= b.size() && (c >= b)) {
 			if (c == b) {
 				c.clear();
@@ -133,7 +133,7 @@ Long Long::divide2(const Long & b, Long& rem) const
 	}
 
 	Long r, c;
-	ull tmp = 0;
+	// ull tmp = 0;  // Unused variable removed
 	r = binsearch(*this, b, c, null, *this);
 	c = *this - r;
 	if (c == null)
@@ -145,7 +145,7 @@ Long Long::divide2(const Long & b, Long& rem) const
 
 Long Long::mult_inv(const Long& b) const
 {
-	int fl = (sign * b.sign);
+	// int fl = (sign * b.sign);  // Unused variable removed
 	Long tmp;
 	int len = size() + b.size() - 1;
 	if (len <= 0) return null;

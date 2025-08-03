@@ -6,7 +6,7 @@ bool Long::operator==(const Long & o) const
 		return true;
 	if (sign != o.sign) return false;
 	else if (size() != o.size()) return false;
-	for (int i = 0; i < size(); ++i) {
+	for (int i = 0; i < static_cast<int>(size()); ++i) {
 		if (a[i] != o[i]) return false;
 	}
 	return true;

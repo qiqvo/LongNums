@@ -25,7 +25,7 @@ Long Long::toomcook_mul(const Long & b) const
 			mode = k;
 		else if (mode == 2)
 			mode = k + k;
-		for (uint i = mode; i < k + mode && i < what.size(); ++i) {
+		for (uint i = mode; i < static_cast<uint>(k + mode) && i < static_cast<uint>(what.size()); ++i) {
 			wh.a[i - mode] = what[i];
 		}
 		wh.normal();

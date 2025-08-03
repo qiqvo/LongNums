@@ -23,9 +23,9 @@ Real::operator std::string() const {
 	else {
 		s += std::to_string(a[i--]);
 		while (i >= 0) {
-			if (j > mantisa_place)
-				for (auto tmp = 0; tmp < bs; ++tmp) {
-					if (j - tmp == mantisa_place)
+			if (j > static_cast<int>(mantisa_place))
+				for (auto tmp = 0; tmp < static_cast<int>(bs); ++tmp) {
+					if (j - tmp == static_cast<int>(mantisa_place))
 						s += std::string(delim_mant);
 				}
 			else 
@@ -40,14 +40,14 @@ Real Real::normalmant()
 {
 	if (mantisa_place == 0)
 		return *this;
-	int bs = std::log10(base);
+	// int bs = std::log10(base);  // Unused variable removed
 	vector<ull> vec;
 	int j = 0;
 	if (a[0] == 0) {
 		do {
 			++j;
-		} while (j < size() && a[j] == 0); 
-		while (j < size())
+		} while (j < static_cast<int>(size()) && a[j] == 0); 
+		while (j < static_cast<int>(size()))
 			vec.push_back(a[j++]);
 		a = vec;
 		return normalmant();
@@ -89,7 +89,7 @@ Real Real::operator-(const Real & o) const {
 
 	auto m1 = mmant ? mantisa_place : o.mantisa_place;
 	auto m2 = mmant ? o.mantisa_place : mantisa_place;
-	int bs = std::log10(base);
+	// int bs = std::log10(base);  // Unused variable removed
 	auto t10 = 0; auto t = p2[0];
 	while (t % 10 == 0) {
 		++t10; t = t / 10;
@@ -144,13 +144,13 @@ Long to_Long(const Real & a)
 {
 	vector<ull> c;
 	int i = a.real_size(), j = a.get_mant(), k = a.size() - 1;
-	int tmp = 0;
+	// int tmp = 0;  // Unused variable removed
 	while (k > 0 && i > j) {
 		c.push_back(a[k]);
 		i -= (a[k] == 0) ? std::log10(a[k]) + 1 : Long::bs;
 		--k;
 	}
-	for (int d = 0; d < c.size() / 2; ++d) 
+	for (int d = 0; d < static_cast<int>(c.size()) / 2; ++d) 
 		std::swap(c[d], c[c.size() - d - 1]);
 
 	return Long(c);// / std::pow(10, j - i - tmp);
