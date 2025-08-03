@@ -28,7 +28,6 @@ include_directories(include)
 set(SOURCES
     src/matrix.cpp
     src/algorithms.cpp
-    src/alphatensor_algorithms.cpp
     src/benchmark.cpp
     src/main.cpp
 )

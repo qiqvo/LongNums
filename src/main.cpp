@@ -224,34 +224,41 @@ int main(int argc, char* argv[]) {
         for (size_t i = 0; i < args.size(); ++i) {
             if (args[i] == "--demo" || args[i] == "-d") {
                 size_type demo_size = 4;
-                if (i + 1 < args.size() && args[i + 1].substr(0, 2) != "--") {
-                    demo_size = std::stoul(args[++i]);
+                // Look for --size parameter
+                for (size_t j = i + 1; j < args.size(); ++j) {
+                    if (args[j] == "--size" && j + 1 < args.size()) {
+                        demo_size = std::stoul(args[j + 1]);
+                        break;
+                    }
                 }
                 run_demo(demo_size);
                 return 0;
             }
             else if (args[i] == "--benchmark" || args[i] == "-b") {
                 // Parse benchmark options
-                while (i + 1 < args.size() && args[i + 1].substr(0, 2) != "--") {
-                    ++i;
-                    if (args[i] == "--algorithm") {
-                        algorithm_name = args[++i];
+                for (size_t j = i + 1; j < args.size(); ++j) {
+                    if (args[j] == "--algorithm") {
+                        algorithm_name = args[j + 1];
+                        j++; // Skip the value
                     }
-                    else if (args[i] == "--sizes") {
-                        std::string sizes_str = args[++i];
+                    else if (args[j] == "--sizes") {
+                        std::string sizes_str = args[j + 1];
                         std::stringstream ss(sizes_str);
                         std::string size_str;
                         while (std::getline(ss, size_str, ',')) {
                             sizes.push_back(std::stoul(size_str));
                         }
+                        j++; // Skip the value
                     }
-                    else if (args[i] == "--trials") {
-                        trials = std::stoul(args[++i]);
+                    else if (args[j] == "--trials") {
+                        trials = std::stoul(args[j + 1]);
+                        j++; // Skip the value
                     }
-                    else if (args[i] == "--output") {
-                        output_file = args[++i];
+                    else if (args[j] == "--output") {
+                        output_file = args[j + 1];
+                        j++; // Skip the value
                     }
-                    else if (args[i] == "--verbose" || args[i] == "-v") {
+                    else if (args[j] == "--verbose" || args[j] == "-v") {
                         verbose = true;
                     }
                 }
@@ -268,26 +275,41 @@ int main(int argc, char* argv[]) {
                 
                 // Parse sizes for comparison
                 std::vector<size_type> compare_sizes;
-                while (i + 1 < args.size() && args[i + 1].substr(0, 2) != "--") {
-                    ++i;
-                    if (args[i] == "--sizes") {
-                        std::string sizes_str = args[++i];
+                for (size_t j = i + 1; j < args.size(); ++j) {
+                    if (args[j] == "--sizes") {
+                        std::string sizes_str = args[j + 1];
                         std::stringstream ss(sizes_str);
                         std::string size_str;
                         while (std::getline(ss, size_str, ',')) {
                             compare_sizes.push_back(std::stoul(size_str));
                         }
+                        j++; // Skip the value
                     }
                 }
                 compare_algorithms(algo1, algo2, compare_sizes);
                 return 0;
             }
             else if (args[i] == "--scaling") {
-                if (i + 1 >= args.size()) {
-                    std::cerr << "Error: --scaling requires an algorithm name\n";
-                    return 1;
+                std::string algo_name;
+                // Look for --algorithm parameter
+                for (size_t j = i + 1; j < args.size(); ++j) {
+                    if (args[j] == "--algorithm") {
+                        if (j + 1 >= args.size()) {
+                            std::cerr << "Error: --algorithm requires an algorithm name\n";
+                            return 1;
+                        }
+                        algo_name = args[j + 1];
+                        break;
+                    }
                 }
-                std::string algo_name = args[++i];
+                // If no --algorithm found, use the next argument as algorithm name
+                if (algo_name.empty()) {
+                    if (i + 1 >= args.size()) {
+                        std::cerr << "Error: --scaling requires an algorithm name\n";
+                        return 1;
+                    }
+                    algo_name = args[i + 1];
+                }
                 analyze_scaling(algo_name);
                 return 0;
             }
