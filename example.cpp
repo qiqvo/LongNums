@@ -24,13 +24,13 @@ int main() {
     std::cout << "\nTesting different algorithms...\n";
     std::cout << "================================\n";
     
-    std::vector<std::shared_ptr<MatrixMultiplicationAlgorithm>> algorithms = {
-        std::make_shared<NaiveAlgorithm>(),
-        std::make_shared<BlockAlgorithm>(),
-        std::make_shared<StrassenAlgorithm>(),
-        std::make_shared<WinogradAlgorithm>(),
-        std::make_shared<AlphaTensorAlgorithm>("gpu"),
-        std::make_shared<HybridAlgorithm>()
+    std::vector<std::shared_ptr<MatrixMultiplicationAlgorithm<double>>> algorithms = {
+        std::make_shared<NaiveAlgorithm<double>>(),
+        std::make_shared<BlockAlgorithm<double>>(),
+        std::make_shared<StrassenAlgorithm<double>>(),
+        std::make_shared<WinogradAlgorithm<double>>(),
+        std::make_shared<AlphaTensorAlgorithm<double>>("gpu"),
+        std::make_shared<HybridAlgorithm<double>>()
     };
     
     Matrix reference_result;
@@ -75,11 +75,11 @@ int main() {
     config.verbose = false;
     config.matrix_sizes = {64, 128, 256};
     
-    MatrixBenchmarker benchmarker(config);
+    MatrixBenchmarker<double> benchmarker(config);
     
     // Compare naive vs strassen
-    auto naive = std::make_shared<NaiveAlgorithm>();
-    auto strassen = std::make_shared<StrassenAlgorithm>();
+    auto naive = std::make_shared<NaiveAlgorithm<double>>();
+    auto strassen = std::make_shared<StrassenAlgorithm<double>>();
     
     auto comparison = benchmarker.compare_algorithms(naive, strassen);
     
@@ -106,7 +106,7 @@ int main() {
     std::cout << "\n\nScaling Analysis\n";
     std::cout << "================\n";
     
-    ScalabilityAnalyzer analyzer;
+    ScalabilityAnalyzer<double> analyzer;
     std::vector<size_type> sizes = {64, 128, 256, 512};
     auto scaling_result = analyzer.analyze_scaling(strassen, sizes);
     

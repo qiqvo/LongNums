@@ -25,7 +25,7 @@ int main() {
     B.print(std::cout, 1);
     
     // Test naive algorithm
-    auto naive = std::make_shared<NaiveAlgorithm>();
+    auto naive = std::make_shared<NaiveAlgorithm<double>>();
     Matrix result = naive->multiply(A, B);
     
     std::cout << "\nResult (A * B):\n";

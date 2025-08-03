@@ -49,13 +49,13 @@ void run_demo(size_type size = 4) {
     B.print(std::cout, 3);
     
     // Test different algorithms
-    std::vector<std::shared_ptr<MatrixMultiplicationAlgorithm>> algorithms = {
-        std::make_shared<NaiveAlgorithm>(),
-        std::make_shared<BlockAlgorithm>(),
-        std::make_shared<StrassenAlgorithm>(),
-        std::make_shared<WinogradAlgorithm>(),
-        std::make_shared<AlphaTensorAlgorithm>("gpu"),
-        std::make_shared<HybridAlgorithm>()
+    std::vector<std::shared_ptr<MatrixMultiplicationAlgorithm<double>>> algorithms = {
+        std::make_shared<NaiveAlgorithm<double>>(),
+        std::make_shared<BlockAlgorithm<double>>(),
+        std::make_shared<StrassenAlgorithm<double>>(),
+        std::make_shared<WinogradAlgorithm<double>>(),
+        std::make_shared<AlphaTensorAlgorithm<double>>("gpu"),
+        std::make_shared<HybridAlgorithm<double>>()
     };
     
     std::cout << "\nResults:\n";
@@ -76,7 +76,7 @@ void run_demo(size_type size = 4) {
                       << (2.0 * size * size * size) / (time_ms * 1e6) << "\n";
             
             // Verify correctness
-            Matrix expected = NaiveAlgorithm().multiply(A, B);
+            Matrix expected = NaiveAlgorithm<double>().multiply(A, B);
             bool correct = result.is_equal(expected, 1e-10);
             std::cout << "Correct: " << (correct ? "Yes" : "No") << "\n";
             
@@ -106,11 +106,11 @@ void run_benchmark(const std::string& algorithm_name = "",
         config.matrix_sizes = sizes;
     }
     
-    MatrixBenchmarker benchmarker(config);
+    MatrixBenchmarker<double> benchmarker(config);
     
     if (!algorithm_name.empty()) {
         // Benchmark specific algorithm
-        auto algorithm = AlgorithmFactory::create(algorithm_name);
+        auto algorithm = AlgorithmFactory<double>::create(algorithm_name);
         std::cout << "Benchmarking " << algorithm->name() << " algorithm...\n\n";
         
         auto results = benchmarker.benchmark_algorithms({algorithm});
@@ -140,8 +140,8 @@ void compare_algorithms(const std::string& algo1_name, const std::string& algo2_
     std::cout << "Algorithm Comparison: " << algo1_name << " vs " << algo2_name << "\n";
     std::cout << "================================================\n\n";
     
-    auto algo1 = AlgorithmFactory::create(algo1_name);
-    auto algo2 = AlgorithmFactory::create(algo2_name);
+    auto algo1 = AlgorithmFactory<double>::create(algo1_name);
+    auto algo2 = AlgorithmFactory<double>::create(algo2_name);
     
     BenchmarkConfig config;
     config.num_trials = 5;
@@ -151,7 +151,7 @@ void compare_algorithms(const std::string& algo1_name, const std::string& algo2_
         config.matrix_sizes = sizes;
     }
     
-    MatrixBenchmarker benchmarker(config);
+    MatrixBenchmarker<double> benchmarker(config);
     auto comparison = benchmarker.compare_algorithms(algo1, algo2);
     
     std::cout << std::setw(10) << "Size" 
@@ -181,8 +181,8 @@ void analyze_scaling(const std::string& algorithm_name) {
     std::cout << "Scaling Analysis: " << algorithm_name << "\n";
     std::cout << "==============================\n\n";
     
-    auto algorithm = AlgorithmFactory::create(algorithm_name);
-    ScalabilityAnalyzer analyzer;
+    auto algorithm = AlgorithmFactory<double>::create(algorithm_name);
+    ScalabilityAnalyzer<double> analyzer;
     
     std::vector<size_type> sizes = {64, 128, 256, 512, 1024};
     auto scaling_result = analyzer.analyze_scaling(algorithm, sizes);
