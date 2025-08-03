@@ -1,5 +1,5 @@
-#include "Long.h"
-#include "Real.h"
+#include "long.h"
+#include "real.h"
 #include <iostream>
 #include <chrono>
 #include <vector>

@@ -17,21 +17,21 @@ find_package(Threads REQUIRED)
 
 # Source files
 set(SOURCES
-    src/Source.cpp
-    src/Long.cpp
-    src/Real.cpp
-    src/Random.cpp
-    src/Sum.cpp
-    src/Mult.cpp
-    src/Operators.cpp
-    src/Compare.cpp
-    src/Karac_mul.cpp
-    src/Toomcook_mul.cpp
-    src/Strassen_mul.cpp
-    src/Division_Inverse.cpp
-    src/Math.cpp
-    src/Prime_Test.cpp
-    src/Utils.cpp
+    src/main.cpp
+    src/long.cpp
+    src/real.cpp
+    src/random.cpp
+    src/sum.cpp
+    src/mult.cpp
+    src/operators.cpp
+    src/compare.cpp
+    src/karatsuba_mul.cpp
+    src/toomcook_mul.cpp
+    src/strassen_mul.cpp
+    src/division_inverse.cpp
+    src/math.cpp
+    src/prime_test.cpp
+    src/utils.cpp
 )
 
 # Header files

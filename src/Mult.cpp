@@ -1,5 +1,5 @@
-#include "Long.h"
-#include "Real.h"
+#include "long.h"
+#include "real.h"
  
 template <class T>
 T binsearch(const Long& a, const Long& b, Long& pr, const T& _l, const T& _r);

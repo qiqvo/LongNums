@@ -1,4 +1,4 @@
-﻿#include "Long.h"
+﻿#include "long.h"
  
 Long Long::toomcook_mul(const Long & b) const
 {

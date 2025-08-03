@@ -1,8 +1,8 @@
-#include "Long.h"
+#include "long.h"
 #include <ctime>
 #include <thread>
 
-#include "Random.h"
+#include "random.h"
 
  
 typedef QuadConGen RandGen;

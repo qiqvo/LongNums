@@ -1,5 +1,5 @@
-#include "Long.h"
-#include "Real.h"
+#include "long.h"
+#include "real.h"
 
 Real inverse(const Long& a, uint iterations) {
 	auto rs = a.real_size() + 1;

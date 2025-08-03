@@ -34,24 +34,24 @@ LongNums/
 ├── BUILD_GUIDE.md         # Build instructions
 ├── .gitignore             # Git ignore rules
 ├── include/               # Header files
-│   ├── Long.h            # Long integer class
-│   ├── Real.h            # Real number class
-│   └── Random.h          # Random number generation
+│   ├── long.h            # Long integer class
+│   ├── real.h            # Real number class
+│   └── random.h          # Random number generation
 ├── src/                   # Source files
-│   ├── Source.cpp        # Main program entry point
-│   ├── Long.cpp          # Long integer implementation
-│   ├── Real.cpp          # Real number implementation
-│   ├── Random.cpp        # Random number generation
-│   ├── Karac_mul.cpp     # Karatsuba multiplication
-│   ├── Toomcook_mul.cpp  # Toom-Cook multiplication
-│   ├── Strassen_mul.cpp  # Strassen multiplication
-│   ├── Sum.cpp           # Addition operations
-│   ├── Mult.cpp          # Basic multiplication
-│   ├── Operators.cpp     # Arithmetic operators
-│   ├── Compare.cpp       # Comparison operations
-│   ├── Division_Inverse.cpp # Division operations
-│   ├── Math.cpp          # Mathematical functions
-│   └── Prime_Test.cpp    # Prime testing algorithms
+│   ├── main.cpp          # Main program entry point
+│   ├── long.cpp          # Long integer implementation
+│   ├── real.cpp          # Real number implementation
+│   ├── random.cpp        # Random number generation
+│   ├── karatsuba_mul.cpp # Karatsuba multiplication
+│   ├── toomcook_mul.cpp  # Toom-Cook multiplication
+│   ├── strassen_mul.cpp  # Strassen multiplication
+│   ├── sum.cpp           # Addition operations
+│   ├── mult.cpp          # Basic multiplication
+│   ├── operators.cpp     # Arithmetic operators
+│   ├── compare.cpp       # Comparison operations
+│   ├── division_inverse.cpp # Division operations
+│   ├── math.cpp          # Mathematical functions
+│   └── prime_test.cpp    # Prime testing algorithms
 └── tests/                # Test files
     └── test_basic.cpp    # Basic functionality tests
 ```

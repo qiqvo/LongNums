@@ -1,4 +1,4 @@
-#include "Long.h"
+#include "long.h"
 
 Long Long::karac_mul(const Long & b) const
 {

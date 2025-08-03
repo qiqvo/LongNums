@@ -1,4 +1,4 @@
-#include "Long.h"
+#include "long.h"
 
 struct PrimeTest {
 	static double not_prime;

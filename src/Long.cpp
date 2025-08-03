@@ -1,4 +1,4 @@
-﻿#include "Long.h"
+﻿#include "long.h"
 #include <fstream>
 #include <time.h>    // time
 //#include <thread>
