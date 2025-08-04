@@ -6,6 +6,8 @@
 template<typename T>
 Matrix<T> Matrix<T>::MatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
     // This is a static method that should be overridden by specific algorithms
+    (void)matrix;  // Suppress unused parameter warning
+    (void)other;   // Suppress unused parameter warning
     throw std::runtime_error("MatrixMultiplicationAlgorithm::multiply() called on base class");
 }
 

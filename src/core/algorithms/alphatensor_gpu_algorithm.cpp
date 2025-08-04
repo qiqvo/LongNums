@@ -32,19 +32,11 @@ template<typename T>
 Matrix<T> Matrix<T>::AlphaTensorGPUMatrixMultiplicationAlgorithm::alpha_tensor_4x4(const Matrix<T>& A, const Matrix<T>& B) {
     // AlphaTensor factorization for 4x4 matrices
     // This is a simplified implementation
-    Matrix result(4, 4);
-    
-    // For now, fall back to Strassen's algorithm
     return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(A, B);
 }
 
 template<typename T>
 Matrix<T> Matrix<T>::AlphaTensorGPUMatrixMultiplicationAlgorithm::alpha_tensor_2x2(const Matrix<T>& A, const Matrix<T>& B) {
-    // AlphaTensor factorization for 2x2 matrices
-    // This is a simplified implementation
-    Matrix result(2, 2);
-    
-    // For now, fall back to Strassen's algorithm
     return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(A, B);
 }
 
