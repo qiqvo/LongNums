@@ -1,5 +1,5 @@
 #ifndef MATRIX_FUNCTIONS
-#include "matrix.h"
+#include "core/matrix.h"
 
 // Non-template (regular) function implementations go here
 // Currently empty since all functions are templates

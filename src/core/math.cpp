@@ -2,7 +2,7 @@
 #include <ctime>
 #include <thread>
 
-#include "random/random.h"
+#include "random/quad_con_gen.h"
 
  
 typedef QuadConGen RandGen;

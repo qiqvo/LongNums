@@ -21,10 +21,12 @@ set(SOURCES
     src/core/long.cpp
     src/core/matrix.cpp
     src/core/real.cpp
-    src/random/random.cpp
-    src/math/toomcook_mul.cpp
-    src/math/strassen_mul.cpp
-    src/math/math.cpp
+    src/core/strassen_mul.cpp
+    src/core/toomcook_mul.cpp
+    src/core/math.cpp
+    src/random/generator_general.cpp
+    src/random/evenly_gen.cpp
+    src/random/quad_con_gen.cpp
     src/prime/prime_test.cpp
     src/utils/utils.cpp
 )
@@ -34,8 +36,10 @@ set(HEADERS
     include/core/long.h
     include/core/matrix.h
     include/core/real.h
-    include/random/random.h
-    include/math/math.h
+    include/core/math.h
+    include/random/generator_general.h
+    include/random/evenly_gen.h
+    include/random/quad_con_gen.h
     include/prime/prime_test.h
     include/utils/utils.h
 )
