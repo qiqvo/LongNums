@@ -174,18 +174,22 @@ void Matrix<T>::check_bounds(size_type row, size_type col) const {
 
 // Matrix multiplication with algorithm selection (legacy method)
 template<typename T>
-Matrix<T> Matrix<T>::multiply(const Matrix& other, Algorithm algo=Algorithm::AUTO) const {
+Matrix<T> Matrix<T>::multiply(const Matrix& other, typename Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType algo) const {
     switch (algo) {
-        case Algorithm::NAIVE:
-            return Matrix<T>::NaiveAlgorithm::multiply(*this, other);
-        case Algorithm::BLOCK:
-            return Matrix<T>::BlockAlgorithm::multiply(*this, other);
-        case Algorithm::STRASSEN:
-            return Matrix<T>::StrassenAlgorithm::multiply(*this, other);
-        case Algorithm::WINOGRAD:
-            return Matrix<T>::WinogradAlgorithm::multiply(*this, other);
-        case Algorithm::HYBRID:
-            return Matrix<T>::HybridAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::NAIVE:
+            return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::BLOCK:
+            return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::STRASSEN:
+            return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::WINOGRAD:
+            return Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::HYBRID:
+            return Matrix<T>::HybridMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO:
+            return Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(*this, other);
+        default:
+            return Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(*this, other);
     }
 }
 

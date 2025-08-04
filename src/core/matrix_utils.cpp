@@ -151,34 +151,6 @@ const std::vector<typename Matrix<T>::value_type>& Matrix<T>::get_data() const {
     return data_;
 }
 
-// Algorithm selection and configuration
-template<typename T>
-typename Matrix<T>::Algorithm Matrix<T>::select_best_algorithm(size_type size) {
-    if (size <= thresholds_.naive_threshold) {
-        return Algorithm::NAIVE;
-    } else if (size <= thresholds_.strassen_threshold) {
-        return Algorithm::BLOCK;
-    } else {
-        return Algorithm::STRASSEN;
-    }
-}
-
-template<typename T>
-void Matrix<T>::set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size) {
-    thresholds_.naive_threshold = naive_threshold;
-    thresholds_.strassen_threshold = strassen_threshold;
-    thresholds_.block_size = block_size;
-}
-
-template<typename T>
-typename Matrix<T>::Thresholds Matrix<T>::get_thresholds() {
-    return thresholds_;
-}
-
-// Static member initialization
-template<typename T>
-typename Matrix<T>::Thresholds Matrix<T>::thresholds_ = {64, 512, 64};
-
 // Free functions
 template<typename T>
 Matrix<T> operator*(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix) {

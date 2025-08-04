@@ -2,11 +2,12 @@
 #include "core/matrix.h"
 #else
 
-// AlphaTensorTPUAlgorithm class implementation
-template<typename T>
-Matrix<T> Matrix<T>::AlphaTensorTPUAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    Algorithm::validate_dimensions(matrix, other);
-    return matrix.multiply_alphatensor(other, "tpu");
-}
+// // AlphaTensorTPUMatrixMultiplicationAlgorithm class implementation
+// template<typename T>
+// Matrix<T> Matrix<T>::AlphaTensorTPUMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+//     MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
+//     // For now, fall back to Strassen's algorithm
+//     return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
+// }
 
 #endif // MATRIX_FUNCTIONS 

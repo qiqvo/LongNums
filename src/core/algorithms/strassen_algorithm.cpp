@@ -2,21 +2,21 @@
 #include "core/matrix.h"
 #else
 
-// StrassenAlgorithm class implementation
+// StrassenMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::StrassenAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    Algorithm::validate_dimensions(matrix, other);
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
     
     if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
         // Fall back to naive for non-square matrices
-        return matrix.multiply_naive(other);
+        return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
     }
     
     return strassen_recursive(matrix, other);
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::StrassenAlgorithm::strassen_recursive(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     if (n <= 2) {
@@ -93,7 +93,7 @@ Matrix<T> Matrix<T>::StrassenAlgorithm::strassen_recursive(const Matrix<T>& A, c
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::StrassenAlgorithm::strassen_2x2(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_2x2(const Matrix<T>& A, const Matrix<T>& B) {
     Matrix result(2, 2);
     
     // Direct 2x2 multiplication (Strassen's algorithm for 2x2)

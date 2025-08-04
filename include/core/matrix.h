@@ -50,42 +50,37 @@ public:
     Matrix& operator*=(value_type scalar);
     Matrix operator*(value_type scalar) const;
     
-    // Matrix multiplication with algorithm selection
-    Matrix multiply(const Matrix& other) const;
-    
-
-    
-    // Algorithm types for matrix multiplication
-    enum class AlgorithmType {
-        NAIVE,
-        BLOCK,
-        STRASSEN,
-        WINOGRAD,
-        ALPHATENSOR_GPU,
-        ALPHATENSOR_TPU,
-        HYBRID,
-        AUTO  // Automatically choose the best algorithm
-    };
-
-    class Algorithm {
+    class MatrixMultiplicationAlgorithm {
         private:
         static Matrix construct_result(const Matrix& matrix, const Matrix& other);
         static void validate_dimensions(const Matrix& matrix, const Matrix& other);
         public:
+        // MatrixMultiplicationAlgorithm types for matrix multiplication
+        enum class AlgorithmType {
+            NAIVE,
+            BLOCK,
+            STRASSEN,
+            WINOGRAD,
+            ALPHATENSOR_GPU,
+            ALPHATENSOR_TPU,
+            HYBRID,
+            AUTO  // Automatically choose the best algorithm
+        };
+
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
-    class NaiveAlgorithm {
+    class NaiveMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
-    class BlockAlgorithm {
+    class BlockMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other, size_type block_size = 64);
     };
 
-    class StrassenAlgorithm {
+    class StrassenMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
         
@@ -94,44 +89,51 @@ public:
         static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
     };
 
-    class WinogradAlgorithm {
+    class WinogradMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        private:
+        static Matrix winograd_recursive(const Matrix& A, const Matrix& B);
+        static Matrix winograd_2x2(const Matrix& A, const Matrix& B);
+    };
+
+    class HybridMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
-    class HybridAlgorithm {
+    class AutoMatrixMultiplicationAlgorithm {
         public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
-    };
 
-    class AutoAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
-    };
-
-    class AlphaTensorGPUAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
-    };
-
-    class AlphaTensorTPUAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
-    };
-
-    // Algorithm selection and configuration
-    static AlgorithmType select_best_algorithm(size_type size);
-    static void set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size);
+        // MatrixMultiplicationAlgorithm selection and configuration
+        static void set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size);
+        
+        // Thresholds structure for algorithm configuration
+        struct AutoMatrixMultiplicationAlgorithmThresholds {
+            size_type naive_threshold = 64;
+            size_type strassen_threshold = 512;
+            size_type block_size = 64;
+        };
+        
+        static AutoMatrixMultiplicationAlgorithmThresholds thresholds_;
     
-    // Thresholds structure for algorithm configuration
-    struct Thresholds {
-        size_type naive_threshold = 64;
-        size_type strassen_threshold = 512;
-        size_type block_size = 64;
+        static AutoMatrixMultiplicationAlgorithmThresholds get_thresholds();
+        
+        static typename Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType select_best_algorithm(size_type size);
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
-    
-    static Thresholds get_thresholds();
-    
+
+    class AlphaTensorGPUMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        private:
+        static Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B);
+        static Matrix alpha_tensor_2x2(const Matrix& A, const Matrix& B);
+    };
+
+    // Matrix multiplication with algorithm selection
+    Matrix multiply(const Matrix& other, typename Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType algo = Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO) const;
+
     // Utility methods
     size_type rows() const;
     size_type cols() const;
@@ -173,18 +175,9 @@ private:
     size_type cols_;
     std::vector<value_type> data_;
     
-    // Static configuration for algorithm selection
-    static Thresholds thresholds_;
-    
     // Helper methods
     size_type index(size_type row, size_type col) const;
     void check_bounds(size_type row, size_type col) const;
-    
-    // Private algorithm helper methods
-    Matrix winograd_recursive(const Matrix& A, const Matrix& B) const;
-    Matrix winograd_2x2(const Matrix& A, const Matrix& B) const;
-    Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B) const;
-    Matrix alpha_tensor_2x2(const Matrix& A, const Matrix& B) const;
 };
 
 // Free functions
