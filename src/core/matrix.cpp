@@ -370,47 +370,23 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 template<typename T>
 typename Matrix<T>::Thresholds Matrix<T>::thresholds_ = {64, 512, 64};
 
-// Matrix multiplication with algorithm selection
+// Algorithm class implementations
 template<typename T>
-Matrix<T> Matrix<T>::multiply(const Matrix& other, Algorithm algo) const {
-    if (algo == Algorithm::AUTO) {
-        algo = select_best_algorithm(rows_);
-    }
-    
-    switch (algo) {
-        case Algorithm::NAIVE:
-            return multiply_naive(other);
-        case Algorithm::BLOCK:
-            return multiply_block(other, thresholds_.block_size);
-        case Algorithm::STRASSEN:
-            return multiply_strassen(other);
-        case Algorithm::WINOGRAD:
-            return multiply_winograd(other);
-        case Algorithm::ALPHATENSOR_GPU:
-            return multiply_alphatensor(other, "gpu");
-        case Algorithm::ALPHATENSOR_TPU:
-            return multiply_alphatensor(other, "tpu");
-        case Algorithm::HYBRID:
-            return multiply_hybrid(other);
-        default:
-            return multiply_naive(other);
-    }
+Matrix<T> Matrix<T>::Algorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    // This is a static method that should be overridden by specific algorithms
+    throw std::runtime_error("Algorithm::multiply() called on base class");
 }
 
-// Individual algorithm implementations
 template<typename T>
-Matrix<T> Matrix<T>::multiply_naive(const Matrix& other) const {
-    if (cols_ != other.rows_) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
-    }
+Matrix<T> Matrix<T>::NaiveAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    Matrix<T>::Algorithm::validate_dimensions(matrix, other);
+    Matrix<T> result = Matrix<T>::Algorithm::construct_result(matrix, other);
     
-    Matrix result(rows_, other.cols_);
-    
-    for (size_type i = 0; i < rows_; ++i) {
-        for (size_type j = 0; j < other.cols_; ++j) {
+    for (size_type i = 0; i < matrix.rows(); ++i) {
+        for (size_type j = 0; j < other.cols(); ++j) {
             value_type sum = 0.0;
-            for (size_type k = 0; k < cols_; ++k) {
-                sum += (*this)(i, k) * other(k, j);
+            for (size_type k = 0; k < matrix.cols(); ++k) {
+                sum += matrix(i, k) * other(k, j);
             }
             result(i, j) = sum;
         }
@@ -420,26 +396,22 @@ Matrix<T> Matrix<T>::multiply_naive(const Matrix& other) const {
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::multiply_block(const Matrix& other, size_type block_size) const {
-    if (cols_ != other.rows_) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
-    }
+Matrix<T> Matrix<T>::BlockAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other, size_type block_size) {
+    Matrix<T>::Algorithm::validate_dimensions(matrix, other);
+    Matrix<T> result = Matrix<T>::Algorithm::construct_result(matrix, other);
     
-    Matrix result(rows_, other.cols_);
-    result.zero();
-    
-    for (size_type i = 0; i < rows_; i += block_size) {
-        for (size_type j = 0; j < other.cols_; j += block_size) {
-            for (size_type k = 0; k < cols_; k += block_size) {
+    for (size_type i = 0; i < matrix.rows(); i += block_size) {
+        for (size_type j = 0; j < other.cols(); j += block_size) {
+            for (size_type k = 0; k < matrix.cols(); k += block_size) {
                 // Process block
-                size_type i_end = std::min(i + block_size, rows_);
-                size_type j_end = std::min(j + block_size, other.cols_);
-                size_type k_end = std::min(k + block_size, cols_);
+                size_type i_end = std::min(i + block_size, matrix.rows());
+                size_type j_end = std::min(j + block_size, other.cols());
+                size_type k_end = std::min(k + block_size, matrix.cols());
                 
                 for (size_type ii = i; ii < i_end; ++ii) {
                     for (size_type jj = j; jj < j_end; ++jj) {
                         for (size_type kk = k; kk < k_end; ++kk) {
-                            result(ii, jj) += (*this)(ii, kk) * other(kk, jj);
+                            result(ii, jj) += matrix(ii, kk) * other(kk, jj);
                         }
                     }
                 }
@@ -450,110 +422,23 @@ Matrix<T> Matrix<T>::multiply_block(const Matrix& other, size_type block_size) c
     return result;
 }
 
+
 template<typename T>
-Matrix<T> Matrix<T>::multiply_strassen(const Matrix& other) const {
-    if (cols_ != other.rows_) {
+Matrix<T> Matrix<T>::StrassenAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    if (matrix.cols() != other.rows()) {
         throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
     }
     
-    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+    if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
         // Fall back to naive for non-square matrices
-        return multiply_naive(other);
+        return matrix.multiply_naive(other);
     }
     
-    return strassen_recursive(*this, other);
+    return strassen_recursive(matrix, other);
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::multiply_winograd(const Matrix& other) const {
-    if (cols_ != other.rows_) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
-    }
-    
-    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
-        // Fall back to naive for non-square matrices
-        return multiply_naive(other);
-    }
-    
-    return winograd_recursive(*this, other);
-}
-
-template<typename T>
-Matrix<T> Matrix<T>::multiply_alphatensor(const Matrix& other, const std::string& variant) const {
-    if (cols_ != other.rows_) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
-    }
-    
-    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
-        // Fall back to naive for non-square matrices
-        return multiply_naive(other);
-    }
-    
-    size_type n = rows_;
-    
-    // For 4x4 matrices, use the AlphaTensor factorization
-    if (n == 4) {
-        return alpha_tensor_4x4(*this, other);
-    }
-    
-    // For 2x2 matrices, use the basic 2x2 algorithm
-    if (n == 2) {
-        return alpha_tensor_2x2(*this, other);
-    }
-    
-    // For other sizes, fall back to Strassen's algorithm
-    return multiply_strassen(other);
-}
-
-template<typename T>
-Matrix<T> Matrix<T>::multiply_hybrid(const Matrix& other) const {
-    if (cols_ != other.rows_) {
-        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
-    }
-    
-    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
-        // Fall back to naive for non-square matrices
-        return multiply_naive(other);
-    }
-    
-    size_type size = rows_;
-    
-    if (size <= thresholds_.naive_threshold) {
-        return multiply_naive(other);
-    } else if (size <= thresholds_.strassen_threshold) {
-        return multiply_block(other, thresholds_.block_size);
-    } else {
-        return multiply_strassen(other);
-    }
-}
-
-// Algorithm selection and configuration
-template<typename T>
-typename Matrix<T>::Algorithm Matrix<T>::select_best_algorithm(size_type size) {
-    if (size <= thresholds_.naive_threshold) {
-        return Algorithm::NAIVE;
-    } else if (size <= thresholds_.strassen_threshold) {
-        return Algorithm::BLOCK;
-    } else {
-        return Algorithm::STRASSEN;
-    }
-}
-
-template<typename T>
-void Matrix<T>::set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size) {
-    thresholds_.naive_threshold = naive_threshold;
-    thresholds_.strassen_threshold = strassen_threshold;
-    thresholds_.block_size = block_size;
-}
-
-template<typename T>
-typename Matrix<T>::Thresholds Matrix<T>::get_thresholds() {
-    return thresholds_;
-}
-
-// Private algorithm helper methods
-template<typename T>
-Matrix<T> Matrix<T>::strassen_recursive(const Matrix& A, const Matrix& B) const {
+Matrix<T> Matrix<T>::StrassenAlgorithm::strassen_recursive(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     if (n <= 2) {
@@ -630,7 +515,7 @@ Matrix<T> Matrix<T>::strassen_recursive(const Matrix& A, const Matrix& B) const 
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::strassen_2x2(const Matrix& A, const Matrix& B) const {
+Matrix<T> Matrix<T>::StrassenAlgorithm::strassen_2x2(const Matrix<T>& A, const Matrix<T>& B) {
     Matrix result(2, 2);
     
     // Direct 2x2 multiplication (Strassen's algorithm for 2x2)
@@ -649,6 +534,154 @@ Matrix<T> Matrix<T>::strassen_2x2(const Matrix& A, const Matrix& B) const {
     
     return result;
 }
+
+template<typename T>
+Matrix<T> Matrix<T>::WinogradAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    return matrix.multiply_winograd(other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::HybridAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    return matrix.multiply_hybrid(other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::AutoAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    auto best_algorithm = Matrix<T>::AutoAlgorithm::select_best_algorithm(matrix, other);
+
+    switch (best_algorithm) {
+        case AlgorithmType::NAIVE:
+            return Matrix<T>::NaiveAlgorithm::multiply(matrix, other);
+        case AlgorithmType::BLOCK:
+            return Matrix<T>::BlockAlgorithm::multiply(matrix, other, Matrix<T>::get_thresholds().block_size);
+        case AlgorithmType::STRASSEN:
+            return Matrix<T>::StrassenAlgorithm::multiply(matrix, other);
+        case AlgorithmType::WINOGRAD:
+            return matrix.multiply_winograd(other);
+        case AlgorithmType::HYBRID:
+            return matrix.multiply_hybrid(other);
+        default:
+            return matrix.multiply_naive(other);
+    }
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::AlphaTensorGPUAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    return matrix.multiply_alphatensor(other, "gpu");
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::AlphaTensorTPUAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
+    return matrix.multiply_alphatensor(other, "tpu");
+}
+
+// Matrix multiplication with algorithm selection (legacy method)
+template<typename T>
+Matrix<T> Matrix<T>::multiply(const Matrix& other, Algorithm algo=Algorithm::AUTO) const {
+    switch (algo) {
+        case Algorithm::NAIVE:
+            return Matrix<T>::NaiveAlgorithm::multiply(*this, other);
+        case Algorithm::BLOCK:
+            return Matrix<T>::BlockAlgorithm::multiply(*this, other);
+        case Algorithm::STRASSEN:
+            return Matrix<T>::StrassenAlgorithm::multiply(*this, other);
+        case Algorithm::WINOGRAD:
+            return Matrix<T>::WinogradAlgorithm::multiply(*this, other);
+        case Algorithm::HYBRID:
+            return Matrix<T>::HybridAlgorithm::multiply(*this, other);
+    }
+}
+
+
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_winograd(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    return winograd_recursive(*this, other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_alphatensor(const Matrix& other, const std::string& variant) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    size_type n = rows_;
+    
+    // For 4x4 matrices, use the AlphaTensor factorization
+    if (n == 4) {
+        return alpha_tensor_4x4(*this, other);
+    }
+    
+    // For 2x2 matrices, use the basic 2x2 algorithm
+    if (n == 2) {
+        return alpha_tensor_2x2(*this, other);
+    }
+    
+    // For other sizes, fall back to Strassen's algorithm
+    return StrassenAlgorithm::multiply(*this, other);
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::multiply_hybrid(const Matrix& other) const {
+    if (cols_ != other.rows_) {
+        throw std::invalid_argument("Matrix dimensions incompatible for multiplication");
+    }
+    
+    if (!is_square() || !other.is_square() || rows_ != other.rows_) {
+        // Fall back to naive for non-square matrices
+        return multiply_naive(other);
+    }
+    
+    size_type size = rows_;
+    
+    if (size <= thresholds_.naive_threshold) {
+        return multiply_naive(other);
+    } else if (size <= thresholds_.strassen_threshold) {
+        return multiply_block(other, thresholds_.block_size);
+    } else {
+        return StrassenAlgorithm::multiply(*this, other);
+    }
+}
+
+// Algorithm selection and configuration
+template<typename T>
+typename Matrix<T>::Algorithm Matrix<T>::select_best_algorithm(size_type size) {
+    if (size <= thresholds_.naive_threshold) {
+        return Algorithm::NAIVE;
+    } else if (size <= thresholds_.strassen_threshold) {
+        return Algorithm::BLOCK;
+    } else {
+        return Algorithm::STRASSEN;
+    }
+}
+
+template<typename T>
+void Matrix<T>::set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size) {
+    thresholds_.naive_threshold = naive_threshold;
+    thresholds_.strassen_threshold = strassen_threshold;
+    thresholds_.block_size = block_size;
+}
+
+template<typename T>
+typename Matrix<T>::Thresholds Matrix<T>::get_thresholds() {
+    return thresholds_;
+}
+
+// Private algorithm helper methods
 
 template<typename T>
 Matrix<T> Matrix<T>::winograd_recursive(const Matrix& A, const Matrix& B) const {
