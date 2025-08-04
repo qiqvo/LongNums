@@ -178,7 +178,6 @@ private:
     
     // Helper methods
     size_type index(size_type row, size_type col) const;
-    void check_dimensions(const Matrix& other, const std::string& operation) const;
     void check_bounds(size_type row, size_type col) const;
     
     // Private algorithm helper methods
@@ -209,8 +208,19 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
                           T mean = 0.0, T stddev = 1.0,
                           unsigned seed = 42);
 
-// The magic: include the implementation file for templates
+// The magic: include the implementation files for templates
 #define MATRIX_FUNCTIONS
-#include "../../src/core/matrix.cpp"
+#include "../../src/core/matrix_core.cpp"
+#include "../../src/core/algorithms/algorithm_base.cpp"
+#include "../../src/core/algorithms/naive_algorithm.cpp"
+#include "../../src/core/algorithms/block_algorithm.cpp"
+#include "../../src/core/algorithms/strassen_algorithm.cpp"
+#include "../../src/core/algorithms/winograd_algorithm.cpp"
+#include "../../src/core/algorithms/hybrid_algorithm.cpp"
+#include "../../src/core/algorithms/auto_algorithm.cpp"
+#include "../../src/core/algorithms/alphatensor_gpu_algorithm.cpp"
+#include "../../src/core/algorithms/alphatensor_tpu_algorithm.cpp"
+#include "../../src/core/matrix_multiply.cpp"
+#include "../../src/core/matrix_utils.cpp"
 
 #endif // MATRIX_H 

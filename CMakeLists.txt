@@ -19,7 +19,18 @@ find_package(Threads REQUIRED)
 set(SOURCES
     src/main.cpp
     src/core/long.cpp
-    src/core/matrix.cpp
+    src/core/matrix_core.cpp
+    src/core/algorithms/algorithm_base.cpp
+    src/core/algorithms/naive_algorithm.cpp
+    src/core/algorithms/block_algorithm.cpp
+    src/core/algorithms/strassen_algorithm.cpp
+    src/core/algorithms/winograd_algorithm.cpp
+    src/core/algorithms/hybrid_algorithm.cpp
+    src/core/algorithms/auto_algorithm.cpp
+    src/core/algorithms/alphatensor_gpu_algorithm.cpp
+    src/core/algorithms/alphatensor_tpu_algorithm.cpp
+    src/core/matrix_multiply.cpp
+    src/core/matrix_utils.cpp
     src/core/real.cpp
     src/core/strassen_mul.cpp
     src/core/toomcook_mul.cpp
