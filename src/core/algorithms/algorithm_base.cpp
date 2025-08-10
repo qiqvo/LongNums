@@ -13,7 +13,9 @@ Matrix<T> Matrix<T>::MatrixMultiplicationAlgorithm::multiply(const Matrix<T>& ma
 
 template<typename T>
 Matrix<T> Matrix<T>::MatrixMultiplicationAlgorithm::construct_result(const Matrix<T>& matrix, const Matrix<T>& other) {
-    return Matrix<T>(matrix.rows(), other.cols()).zero();
+    Matrix<T> result(matrix.rows(), other.cols());
+    result.zero();
+    return result;
 }
 
 template<typename T>

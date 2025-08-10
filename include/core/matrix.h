@@ -51,10 +51,10 @@ public:
     Matrix operator*(value_type scalar) const;
     
     class MatrixMultiplicationAlgorithm {
-        private:
+        public:
         static Matrix construct_result(const Matrix& matrix, const Matrix& other);
         static void validate_dimensions(const Matrix& matrix, const Matrix& other);
-        public:
+        
         // MatrixMultiplicationAlgorithm types for matrix multiplication
         enum class AlgorithmType {
             NAIVE,
@@ -127,6 +127,13 @@ public:
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
         private:
+        static const int p_size_n = 16;
+        static const int p_size_m = 49;
+
+        static int u[p_size_n * p_size_m];
+        static int v[p_size_n * p_size_m];
+        static int w[p_size_n * p_size_m];
+
         static Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B);
         static Matrix alpha_tensor_2x2(const Matrix& A, const Matrix& B);
     };

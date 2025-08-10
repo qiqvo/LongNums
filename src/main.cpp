@@ -1,5 +1,6 @@
 #include "core/long.h"
 #include "core/real.h"
+#include "core/matrix.h"
 #include <iostream>
 #include <chrono>
 #include <vector>
@@ -158,7 +159,22 @@ int main() {
     }
     cout << endl;
 
-    cout << "=== Demo completed successfully! ===" << endl;
+    // Simple 4x4 diagonal matrices multiplied using AlphaTensor GPU algorithm
+    cout << "\n12+. Matrix AlphaTensorGPU 4x4 diagonal test:" << endl;
+    Matrix<double> A(4, 4);
+    Matrix<double> B(4, 4);
+    A.zero();
+    B.zero();
+    for (int i = 0; i < 4; ++i) {
+        A(i, i) = static_cast<double>(i + 1);       // 1,2,3,4 on diagonal
+        B(i, i) = static_cast<double>((i + 1) * 2); // 2,4,6,8 on diagonal
+    }
+    auto C = Matrix<double>::AlphaTensorGPUMatrixMultiplicationAlgorithm::multiply(A, B);
+    cout << "A:" << endl << A << endl;
+    cout << "B:" << endl << B << endl;
+    cout << "C = A x B (AlphaTensorGPU):" << endl << C << endl;
+
+    cout << "\n=== Demo completed successfully! ===" << endl;
     cout << "The LongNums library is working correctly." << endl;
     
     return 0;

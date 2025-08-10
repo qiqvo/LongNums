@@ -44,7 +44,9 @@ const typename Matrix<T>::value_type& Matrix<T>::operator()(size_type row, size_
 
 template<typename T>
 Matrix<T> Matrix<T>::operator+(const Matrix& other) const {
-    check_dimensions(other, "addition");
+    if (rows_ != other.rows_ || cols_ != other.cols_) {
+        throw std::invalid_argument("Matrix dimensions must match for addition");
+    }
     Matrix result(rows_, cols_);
     for (size_type i = 0; i < data_.size(); ++i) {
         result.data_[i] = data_[i] + other.data_[i];
@@ -54,7 +56,9 @@ Matrix<T> Matrix<T>::operator+(const Matrix& other) const {
 
 template<typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix& other) const {
-    check_dimensions(other, "subtraction");
+    if (rows_ != other.rows_ || cols_ != other.cols_) {
+        throw std::invalid_argument("Matrix dimensions must match for subtraction");
+    }
     Matrix result(rows_, cols_);
     for (size_type i = 0; i < data_.size(); ++i) {
         result.data_[i] = data_[i] - other.data_[i];
