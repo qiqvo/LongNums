@@ -93,21 +93,14 @@ int main() {
     std::cout << std::fixed << std::setprecision(3) << execution_time << " ms\n";
     print_matrix(result, "Result (Auto)");
     
-    // Test AlphaTensor GPU Algorithm
+    // Test AlphaTensor Algorithm
     execution_time = measure_time([&]() {
-        result = Matrix<double>::AlphaTensorGPUAlgorithm::multiply(A, B);
+        result = Matrix<double>::AlphaTensorAlgorithm::multiply(A, B);
     });
-    std::cout << std::left << std::setw(25) << "AlphaTensor GPU:";
+    std::cout << std::left << std::setw(25) << "AlphaTensor:";
     std::cout << std::fixed << std::setprecision(3) << execution_time << " ms\n";
-    print_matrix(result, "Result (AlphaTensor GPU)");
+    print_matrix(result, "Result (AlphaTensor)");
     
-    // Test AlphaTensor TPU Algorithm
-    execution_time = measure_time([&]() {
-        result = Matrix<double>::AlphaTensorTPUAlgorithm::multiply(A, B);
-    });
-    std::cout << std::left << std::setw(25) << "AlphaTensor TPU:";
-    std::cout << std::fixed << std::setprecision(3) << execution_time << " ms\n";
-    print_matrix(result, "Result (AlphaTensor TPU)");
     
     std::cout << "\n=== Algorithm Comparison Complete ===\n";
     

@@ -21,6 +21,7 @@ SOURCES = $(wildcard $(SRCDIR)/*.cpp) \
           $(wildcard $(SRCDIR)/math/*.cpp) \
           $(wildcard $(SRCDIR)/utils/*.cpp)
 OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(BUILDDIR)/%.o)
+OBJECTS_NO_MAIN = $(filter-out $(BUILDDIR)/main.o, $(OBJECTS))
 
 # Target executable
 TARGET = $(BINDIR)/LongNums
@@ -55,6 +56,17 @@ $(BUILDDIR):
 # Run the program
 run: $(TARGET)
 	./$(TARGET)
+
+# Build and run AlphaTensor random test
+TEST_BIN = $(BINDIR)/test_alphatensor_random
+TEST_SRC = tests/test_alphatensor_random.cpp
+
+$(TEST_BIN): $(TEST_SRC) $(OBJECTS_NO_MAIN) | $(BINDIR)
+	$(CXX) $(CXXFLAGS) -I$(INCDIR) $(TEST_SRC) $(OBJECTS_NO_MAIN) -o $(TEST_BIN)
+
+.PHONY: test-alphatensor
+test-alphatensor: $(TEST_BIN)
+	./$(TEST_BIN)
 
 # Clean build artifacts
 clean:

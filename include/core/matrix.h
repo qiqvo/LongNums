@@ -45,10 +45,10 @@ public:
     Matrix operator+(const Matrix& other) const;
     Matrix operator-(const Matrix& other) const;
     Matrix operator*(const Matrix& other) const;
+    Matrix operator*(value_type scalar) const;
     Matrix& operator+=(const Matrix& other);
     Matrix& operator-=(const Matrix& other);
     Matrix& operator*=(value_type scalar);
-    Matrix operator*(value_type scalar) const;
     
     class MatrixMultiplicationAlgorithm {
         public:
@@ -61,8 +61,7 @@ public:
             BLOCK,
             STRASSEN,
             WINOGRAD,
-            ALPHATENSOR_GPU,
-            ALPHATENSOR_TPU,
+            ALPHATENSOR,
             HYBRID,
             AUTO  // Automatically choose the best algorithm
         };
@@ -103,6 +102,7 @@ public:
     };
 
     class AutoMatrixMultiplicationAlgorithm {
+    
         public:
 
         // MatrixMultiplicationAlgorithm selection and configuration
@@ -115,15 +115,14 @@ public:
             size_type block_size = 64;
         };
         
-        static AutoMatrixMultiplicationAlgorithmThresholds thresholds_;
-    
         static AutoMatrixMultiplicationAlgorithmThresholds get_thresholds();
+        static inline AutoMatrixMultiplicationAlgorithmThresholds thresholds_{};
         
         static typename Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType select_best_algorithm(size_type size);
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
-    class AlphaTensorGPUMatrixMultiplicationAlgorithm {
+    class AlphaTensorMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
         private:
@@ -135,7 +134,6 @@ public:
         static int w[p_size_n * p_size_m];
 
         static Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B);
-        static Matrix alpha_tensor_2x2(const Matrix& A, const Matrix& B);
     };
 
     // Matrix multiplication with algorithm selection
@@ -218,8 +216,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/algorithms/winograd_algorithm.cpp"
 #include "../../src/core/algorithms/hybrid_algorithm.cpp"
 #include "../../src/core/algorithms/auto_algorithm.cpp"
-#include "../../src/core/algorithms/alphatensor_gpu_algorithm.cpp"
-#include "../../src/core/algorithms/alphatensor_tpu_algorithm.cpp"
+#include "../../src/core/algorithms/alphatensor_algorithm.cpp"
 #include "../../src/core/matrix_multiply.cpp"
 #include "../../src/core/matrix_utils.cpp"
 

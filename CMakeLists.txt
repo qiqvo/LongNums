@@ -27,8 +27,7 @@ set(SOURCES
     src/core/algorithms/winograd_algorithm.cpp
     src/core/algorithms/hybrid_algorithm.cpp
     src/core/algorithms/auto_algorithm.cpp
-    src/core/algorithms/alphatensor_gpu_algorithm.cpp
-    src/core/algorithms/alphatensor_tpu_algorithm.cpp
+    src/core/algorithms/alphatensor_algorithm.cpp
     src/core/matrix_multiply.cpp
     src/core/matrix_utils.cpp
     src/core/real.cpp

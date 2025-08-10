@@ -43,13 +43,9 @@ int main() {
     auto result_auto = Matrix<double>::AutoAlgorithm::multiply(A, B);
     std::cout << "Auto Algorithm Result:\n" << result_auto << std::endl;
     
-    // AlphaTensor GPU algorithm
-    auto result_alphatensor_gpu = Matrix<double>::AlphaTensorGPUAlgorithm::multiply(A, B);
-    std::cout << "AlphaTensor GPU Algorithm Result:\n" << result_alphatensor_gpu << std::endl;
-    
-    // AlphaTensor TPU algorithm
-    auto result_alphatensor_tpu = Matrix<double>::AlphaTensorTPUAlgorithm::multiply(A, B);
-    std::cout << "AlphaTensor TPU Algorithm Result:\n" << result_alphatensor_tpu << std::endl;
+    // AlphaTensor algorithm
+    auto result_alphatensor = Matrix<double>::AlphaTensorAlgorithm::multiply(A, B);
+    std::cout << "AlphaTensor Algorithm Result:\n" << result_alphatensor << std::endl;
     
     std::cout << "=== All algorithms completed successfully! ===" << std::endl;
     
