@@ -209,7 +209,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 // The magic: include the implementation files for templates
 #define MATRIX_FUNCTIONS
 #include "../../src/core/matrix_core.cpp"
-#include "../../src/core/algorithms/matrix_multiplication_algorithm_base.cpp"
+#include "../../src/core/algorithms/matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/naive_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp"
