@@ -14,7 +14,7 @@ Matrix<T> Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(const Matrix<T>
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::ARM_NEON:
             return Matrix<T>::ArmNeonMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::BLOCK:
-            return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(matrix, other, Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds().block_size);
+            return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::STRASSEN:
             return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::WINOGRAD:

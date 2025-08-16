@@ -5,14 +5,13 @@
 // StrassenMatrixMultiplicationAlgorithm class implementation
 template<typename T>
 Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
-    
-    if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
+    try {
+        DivideAndConquerMatrixMultiplicationAlgorithm::validate_divide_and_conquer_inputs(matrix, other);
+        return strassen_recursive(matrix, other);
+    } catch (const std::invalid_argument&) {
         // Fall back to naive for non-square matrices
         return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
     }
-    
-    return strassen_recursive(matrix, other);
 }
 
 template<typename T>
@@ -24,35 +23,12 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
         return NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
     }
     
-    // Pad matrices to next power of 2 if necessary
-    size_type new_size = 1;
-    while (new_size < n) {
-        new_size *= 2;
-    }
+    // Use parent class helper methods for padding
+    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm::pad_to_power_of_2(A, B);
     
-    if (new_size != n) {
-        Matrix A_padded(new_size, new_size);
-        Matrix B_padded(new_size, new_size);
-        
-        // Copy original matrices
-        for (size_type i = 0; i < n; ++i) {
-            for (size_type j = 0; j < n; ++j) {
-                A_padded(i, j) = A(i, j);
-                B_padded(i, j) = B(i, j);
-            }
-        }
-        
+    if (A_padded.rows() != n) {
         Matrix result_padded = strassen_recursive(A_padded, B_padded);
-        
-        // Extract result
-        Matrix result(n, n);
-        for (size_type i = 0; i < n; ++i) {
-            for (size_type j = 0; j < n; ++j) {
-                result(i, j) = result_padded(i, j);
-            }
-        }
-        
-        return result;
+        return DivideAndConquerMatrixMultiplicationAlgorithm::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing

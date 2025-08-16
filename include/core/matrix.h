@@ -105,9 +105,34 @@ public:
     class BlockMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other, size_type block_size = 64);
+        
+        private:
+        static Matrix block_multiply(const Matrix& A, const Matrix& B, size_type block_size);
     };
 
-    class StrassenMatrixMultiplicationAlgorithm {
+    // Base class for divide-and-conquer matrix multiplication algorithms
+    class DivideAndConquerMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        
+        protected:
+        // Common validation for divide-and-conquer algorithms
+        static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
+        
+        // Helper method to pad matrices to next power of 2
+        static std::pair<Matrix, Matrix> pad_to_power_of_2(const Matrix& A, const Matrix& B);
+        
+        // Helper method to extract result from padded matrix
+        static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
+        
+        // Helper method to check if size is power of 2
+        static bool is_power_of_2(size_type n);
+        
+        // Helper method to get next power of 2
+        static size_type next_power_of_2(size_type n);
+    };
+
+    class StrassenMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
         
@@ -116,7 +141,7 @@ public:
         static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
     };
 
-    class WinogradMatrixMultiplicationAlgorithm {
+    class WinogradMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
         private:
@@ -247,6 +272,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/algorithms/simd_naive_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/block_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/algorithms/divide_and_conquer_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/hybrid_matrix_multiplication_algorithm.cpp"
