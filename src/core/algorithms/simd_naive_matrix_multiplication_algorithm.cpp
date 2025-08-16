@@ -74,7 +74,6 @@ void Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::simd_multiply_aligned(
         }
     }
 }
-
 template<typename T>
 void Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::simd_multiply_unaligned(
     const Matrix<T>& A, const Matrix<T>& B, Matrix<T>& C) {
@@ -113,7 +112,6 @@ void Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::simd_multiply_unaligned(
         }
     }
 }
-
 // Alternative implementation with loop reordering for better cache performance
 template<typename T>
 Matrix<T> Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::multiply_optimized(
@@ -179,4 +177,5 @@ Matrix<T> Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::multiply_fallback(
     return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
 }
 
+#endif
 #endif // MATRIX_FUNCTIONS

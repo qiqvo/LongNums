@@ -9,6 +9,10 @@ Matrix<T> Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(const Matrix<T>
     switch (best_algorithm) {
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::NAIVE:
             return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::SIMD_NAIVE:
+            return Matrix<T>::SimdNaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::ARM_NEON:
+            return Matrix<T>::ArmNeonMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::BLOCK:
             return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(matrix, other, Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds().block_size);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::STRASSEN:
@@ -19,6 +23,11 @@ Matrix<T> Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(const Matrix<T>
             return Matrix<T>::HybridMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::ALPHATENSOR:
             return Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::multiply(matrix, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO:
+            // Fallback to naive for AUTO case to avoid infinite recursion
+            return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
+        default:
+            return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
     }
 }
 
