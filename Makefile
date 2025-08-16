@@ -5,7 +5,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -Wextra -pthread
 DEBUG_FLAGS = -g -DDEBUG
-RELEASE_FLAGS = -O2 -DNDEBUG
+RELEASE_FLAGS = -O2 -DNDEBUG -march=native
 
 # Directories
 SRCDIR = src

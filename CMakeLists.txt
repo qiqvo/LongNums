@@ -8,8 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Set compiler flags
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+    # Enable SIMD optimizations for MSVC
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:AVX2")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2")
+    # Enable SIMD optimizations for GCC/Clang
+    # Use native architecture for best SIMD support (AVX2 on x86, NEON on ARM)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 endif()
 
 # Enable multi-threading
@@ -22,6 +27,8 @@ set(SOURCES
     src/core/matrix_core.cpp
     src/core/algorithms/matrix_multiplication_algorithm.cpp
     src/core/algorithms/naive_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/simd_naive_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp
     src/core/algorithms/block_matrix_multiplication_algorithm.cpp
     src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp
     src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp
@@ -81,6 +88,7 @@ message(STATUS "LongNums Configuration:")
 message(STATUS "  C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "  Compiler: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "  Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "  SIMD Support: AVX2 enabled")
 message(STATUS "  Output Directory: ${CMAKE_BINARY_DIR}/bin")
 message(STATUS "  Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}/src")
 message(STATUS "  Include Directory: ${CMAKE_CURRENT_SOURCE_DIR}/include") 

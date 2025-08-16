@@ -60,6 +60,8 @@ public:
         // MatrixMultiplicationAlgorithm types for matrix multiplication
         enum class AlgorithmType {
             NAIVE,
+            SIMD_NAIVE,
+            ARM_NEON,
             BLOCK,
             STRASSEN,
             WINOGRAD,
@@ -74,6 +76,30 @@ public:
     class NaiveMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
+    };
+
+    class SimdNaiveMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        static Matrix multiply_optimized(const Matrix& matrix, const Matrix& other);
+        static bool is_simd_available();
+        static Matrix multiply_fallback(const Matrix& matrix, const Matrix& other);
+        
+        private:
+        static void simd_multiply_aligned(const Matrix& A, const Matrix& B, Matrix& C);
+        static void simd_multiply_unaligned(const Matrix& A, const Matrix& B, Matrix& C);
+    };
+
+    class ArmNeonMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        static Matrix multiply_optimized(const Matrix& matrix, const Matrix& other);
+        static bool is_neon_available();
+        static Matrix multiply_fallback(const Matrix& matrix, const Matrix& other);
+        
+        private:
+        static void neon_multiply_aligned(const Matrix& A, const Matrix& B, Matrix& C);
+        static void neon_multiply_unaligned(const Matrix& A, const Matrix& B, Matrix& C);
     };
 
     class BlockMatrixMultiplicationAlgorithm {
@@ -218,6 +244,8 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/matrix_core.cpp"
 #include "../../src/core/algorithms/matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/naive_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/algorithms/simd_naive_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp"

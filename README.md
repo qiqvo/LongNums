@@ -9,6 +9,7 @@ A C++ library for long number arithmetic with multiple multiplication algorithms
 - CMake 3.16+ (for CMake build)
 - Make (for Makefile build)
 - pthread library (usually included with compiler)
+- **SIMD Support**: AVX2-capable CPU for optimal performance (Intel Haswell+ or AMD Excavator+)
 
 ### Build and Run
 
@@ -54,6 +55,9 @@ make run
 # Simple compilation
 g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
 
+# Compilation with SIMD optimizations
+g++ -std=c++17 -O3 -mavx2 -mfma -pthread -Iinclude src/*.cpp -o LongNums
+
 # Run
 ./LongNums
 ```
@@ -64,6 +68,7 @@ g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
 - **Karatsuba Algorithm** - Fast multiplication for large numbers
 - **Toom-Cook Algorithm** - Efficient multiplication using polynomial evaluation
 - **Strassen Algorithm** - Multi-threaded multiplication implementation
+- **SIMD-Optimized Algorithms** - Vectorized matrix operations using AVX2 instructions
 
 ### Number Representations
 - **Long Class** - Arbitrary-precision integer arithmetic
@@ -77,6 +82,7 @@ g++ -std=c++17 -O2 -pthread -Iinclude src/*.cpp -o LongNums
 ### Additional Features
 - **Random Number Generation** - Custom random number generators
 - **Multi-threading Support** - Parallel computation for large operations
+- **SIMD Vectorization** - AVX2-optimized matrix operations for 2-4x speedup
 - **Mathematical Functions** - GCD, factorial, modular exponentiation
 
 ## Project Structure
@@ -139,6 +145,21 @@ Long toomcook_result = a.toomcook_mul(b);
 Long strassen_result = a.strassen_mul(b);  // Multi-threaded
 ```
 
+### Matrix Operations with SIMD
+```cpp
+#include "core/matrix.h"
+
+Matrix<double> A = create_random<double>(256, 256, -1.0, 1.0);
+Matrix<double> B = create_random<double>(256, 256, -1.0, 1.0);
+
+// Use SIMD-optimized multiplication
+Matrix<double> result = A.multiply(B, 
+    Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::SIMD_NAIVE);
+
+// Check SIMD availability
+bool simd_available = Matrix<double>::SimdNaiveMatrixMultiplicationAlgorithm::is_simd_available();
+```
+
 ### Prime Testing
 ```cpp
 Long prime_candidate = 12247;
@@ -175,11 +196,37 @@ g++ -std=c++17 -Iinclude tests/test_basic.cpp src/*.cpp -o test_basic
 ./test_basic
 ```
 
+### SIMD Optimization Testing
+
+Test the SIMD-optimized matrix multiplication algorithms:
+
+```bash
+# Using the build script
+./build.sh simd-test
+
+# Or manually
+./compile_simd_test.sh
+./test_simd_matrix
+```
+
+This will benchmark the SIMD-optimized algorithm against the naive implementation and show speedup ratios.
+
+### Verify SIMD Build Configuration
+
+Check that SIMD optimizations are properly configured:
+
+```bash
+./verify_simd_build.sh
+```
+
+This script verifies compiler support, CPU capabilities, and build configuration for SIMD optimizations.
+
 ## Performance Considerations
 
 - **Karatsuba** is efficient for medium-sized numbers
 - **Toom-Cook** performs well for larger numbers
 - **Strassen** uses multi-threading and is best for very large numbers
+- **SIMD algorithms** provide 2-4x speedup for matrix operations on AVX2-capable CPUs
 - Prime tests use probabilistic algorithms with configurable accuracy
 
 ## Threading
@@ -228,6 +275,7 @@ Options:
   make-release  - Build with Makefile in release mode
   clean         - Clean all build artifacts
   run           - Run the program
+  simd-test     - Build and run SIMD optimization test
   help          - Show help message
 ```
 

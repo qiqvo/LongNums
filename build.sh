@@ -129,6 +129,22 @@ case "${1:-release}" in
     "run")
         run_program
         ;;
+    "simd-test")
+        print_status "Building and running SIMD optimization test..."
+        if [ -f "compile_simd_test.sh" ]; then
+            ./compile_simd_test.sh
+            if [ $? -eq 0 ]; then
+                print_status "Running SIMD test..."
+                ./test_simd_matrix
+            else
+                print_error "SIMD test compilation failed!"
+                exit 1
+            fi
+        else
+            print_error "SIMD test script not found!"
+            exit 1
+        fi
+        ;;
     "help"|"-h"|"--help")
         echo "LongNums Build Script"
         echo "===================="
@@ -141,6 +157,7 @@ case "${1:-release}" in
         echo "  make-release  - Build with Makefile in release mode"
         echo "  clean         - Clean all build artifacts"
         echo "  run           - Run the program"
+        echo "  simd-test     - Build and run SIMD optimization test"
         echo "  help          - Show this help message"
         echo ""
         echo "Examples:"
