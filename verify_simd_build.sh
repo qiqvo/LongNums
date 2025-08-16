@@ -115,13 +115,13 @@ else
 fi
 
 # Check if SIMD source files exist
-if [ -f "src/core/algorithms/simd_naive_matrix_multiplication_algorithm.cpp" ]; then
+if [ -f "src/core/matrix_multiplication_algorithms/simd_naive_matrix_multiplication_algorithm.cpp" ]; then
     print_status "✓ x86 SIMD algorithm source file exists"
 else
     print_error "✗ x86 SIMD algorithm source file missing"
 fi
 
-if [ -f "src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp" ]; then
+if [ -f "src/core/matrix_multiplication_algorithms/arm_neon_matrix_multiplication_algorithm.cpp" ]; then
     print_status "✓ ARM NEON algorithm source file exists"
 else
     print_error "✗ ARM NEON algorithm source file missing"
