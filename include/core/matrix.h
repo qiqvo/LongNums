@@ -114,6 +114,10 @@ public:
         private:
         static Matrix strassen_recursive(const Matrix& A, const Matrix& B);
         static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
+        static Matrix strassen_recursive_quadrant(const Matrix& A, const Matrix& B,
+            size_type a_start_row, size_type a_start_col, size_type a_end_row, size_type a_end_col,
+            size_type b_start_row, size_type b_start_col, size_type b_end_row, size_type b_end_col,
+            int a_op, int b_op);
     };
 
     class WinogradMatrixMultiplicationAlgorithm {

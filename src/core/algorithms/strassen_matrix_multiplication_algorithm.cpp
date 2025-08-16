@@ -19,8 +19,8 @@ template<typename T>
 Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
-    if (n <= 2) {
-        return strassen_2x2(A, B);
+    if (n <= 64) {  // Use naive for small matrices to avoid overhead
+        return NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
     }
     
     // Pad matrices to next power of 2 if necessary
@@ -54,27 +54,17 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
         return result;
     }
     
-    // Split matrices into quadrants
+    // Split matrices into quadrants using direct indexing
     size_type half = n / 2;
     
-    Matrix A11 = A.submatrix(0, 0, half, half);
-    Matrix A12 = A.submatrix(0, half, half, n);
-    Matrix A21 = A.submatrix(half, 0, n, half);
-    Matrix A22 = A.submatrix(half, half, n, n);
-    
-    Matrix B11 = B.submatrix(0, 0, half, half);
-    Matrix B12 = B.submatrix(0, half, half, n);
-    Matrix B21 = B.submatrix(half, 0, n, half);
-    Matrix B22 = B.submatrix(half, half, n, n);
-    
-    // Strassen's seven multiplications
-    Matrix P1 = strassen_recursive(A11, B12 - B22);
-    Matrix P2 = strassen_recursive(A11 + A12, B22);
-    Matrix P3 = strassen_recursive(A21 + A22, B11);
-    Matrix P4 = strassen_recursive(A22, B21 - B11);
-    Matrix P5 = strassen_recursive(A11 + A22, B11 + B22);
-    Matrix P6 = strassen_recursive(A12 - A22, B21 + B22);
-    Matrix P7 = strassen_recursive(A11 - A21, B11 + B12);
+    // Strassen's seven multiplications with optimized submatrix operations
+    Matrix P1 = strassen_recursive_quadrant(A, B, 0, 0, 0, half, 0, half, half, n, 0, 1, 1, 1);  // A11 * (B12 - B22)
+    Matrix P2 = strassen_recursive_quadrant(A, B, 0, 0, 0, half, 0, half, 0, half, 0, 0, 1, 1);  // (A11 + A12) * B22
+    Matrix P3 = strassen_recursive_quadrant(A, B, half, 0, n, half, half, half, n, n, 0, 0, 0, 0);  // (A21 + A22) * B11
+    Matrix P4 = strassen_recursive_quadrant(A, B, half, half, n, n, half, 0, n, half, 1, 0, 0, 0);  // A22 * (B21 - B11)
+    Matrix P5 = strassen_recursive_quadrant(A, B, 0, 0, 0, half, half, half, n, n, 0, 0, 0, 0);  // (A11 + A22) * (B11 + B22)
+    Matrix P6 = strassen_recursive_quadrant(A, B, 0, half, 0, half, half, half, n, n, 0, 1, 1, 1);  // (A12 - A22) * (B21 + B22)
+    Matrix P7 = strassen_recursive_quadrant(A, B, 0, 0, 0, half, 0, 0, half, half, 0, 0, 0, 1);  // (A11 - A21) * (B11 + B12)
     
     // Combine results
     Matrix C11 = P5 + P4 - P2 + P6;
@@ -84,12 +74,77 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
     
     // Combine quadrants into result
     Matrix result(n, n);
-    result.set_submatrix(0, 0, C11);
-    result.set_submatrix(0, half, C12);
-    result.set_submatrix(half, 0, C21);
-    result.set_submatrix(half, half, C22);
+    for (size_type i = 0; i < half; ++i) {
+        for (size_type j = 0; j < half; ++j) {
+            result(i, j) = C11(i, j);
+            result(i, j + half) = C12(i, j);
+            result(i + half, j) = C21(i, j);
+            result(i + half, j + half) = C22(i, j);
+        }
+    }
     
     return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive_quadrant(
+    const Matrix<T>& A, const Matrix<T>& B,
+    size_type a_start_row, size_type a_start_col, size_type a_end_row, size_type a_end_col,
+    size_type b_start_row, size_type b_start_col, size_type b_end_row, size_type b_end_col,
+    int a_op, int b_op) {
+    
+    size_type a_rows = a_end_row - a_start_row;
+    size_type a_cols = a_end_col - a_start_col;
+    size_type b_rows = b_end_row - b_start_row;
+    size_type b_cols = b_end_col - b_start_col;
+    
+    // Create temporary matrices for the operation
+    Matrix<T> A_temp(a_rows, a_cols);
+    Matrix<T> B_temp(b_rows, b_cols);
+    
+    // Copy data with operation
+    for (size_type i = 0; i < a_rows; ++i) {
+        for (size_type j = 0; j < a_cols; ++j) {
+            A_temp(i, j) = A(a_start_row + i, a_start_col + j);
+        }
+    }
+    
+    for (size_type i = 0; i < b_rows; ++i) {
+        for (size_type j = 0; j < b_cols; ++j) {
+            B_temp(i, j) = B(b_start_row + i, b_start_col + j);
+        }
+    }
+    
+    // Apply operations based on op codes
+    if (a_op == 1) {  // Addition
+        for (size_type i = 0; i < a_rows; ++i) {
+            for (size_type j = 0; j < a_cols; ++j) {
+                A_temp(i, j) += A(a_start_row + i, a_start_col + j + a_cols);
+            }
+        }
+    } else if (a_op == 2) {  // Subtraction
+        for (size_type i = 0; i < a_rows; ++i) {
+            for (size_type j = 0; j < a_cols; ++j) {
+                A_temp(i, j) -= A(a_start_row + i + a_rows, a_start_col + j + a_cols);
+            }
+        }
+    }
+    
+    if (b_op == 1) {  // Addition
+        for (size_type i = 0; i < b_rows; ++i) {
+            for (size_type j = 0; j < b_cols; ++j) {
+                B_temp(i, j) += B(b_start_row + i + b_rows, b_start_col + j);
+            }
+        }
+    } else if (b_op == 2) {  // Subtraction
+        for (size_type i = 0; i < b_rows; ++i) {
+            for (size_type j = 0; j < b_cols; ++j) {
+                B_temp(i, j) -= B(b_start_row + i, b_start_col + j);
+            }
+        }
+    }
+    
+    return strassen_recursive(A_temp, B_temp);
 }
 
 template<typename T>
