@@ -235,11 +235,9 @@ Matrix<T> Matrix<T>::multiply(const Matrix& other, typename Matrix<T>::MatrixMul
             return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(*this, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::WINOGRAD:
             return Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply(*this, other);
-        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::HYBRID:
-            return Matrix<T>::HybridMatrixMultiplicationAlgorithm::multiply(*this, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO:
             return Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(*this, other);
-        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::ALPHATENSOR:
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::ALPHA_TENSOR:
             return Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::multiply(*this, other);
         default:
             throw std::invalid_argument("Invalid algorithm type");

@@ -27,19 +27,19 @@ Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::split_and_multipl
     size_type block_size = padded_size / 4;
     
     // Divide matrices into 16 blocks (4x4 grid)
-    Matrix<T> A_blocks[4][4];
-    Matrix<T> B_blocks[4][4];
+    Matrix<T> A_blocks[16];
+    Matrix<T> B_blocks[16];
     
     // Extract blocks from A
     for (size_type i = 0; i < 4; ++i) {
         for (size_type j = 0; j < 4; ++j) {
-            A_blocks[i][j] = Matrix<T>(block_size, block_size);
-            B_blocks[i][j] = Matrix<T>(block_size, block_size);
+            A_blocks[i*4 + j] = Matrix<T>(block_size, block_size);
+            B_blocks[i*4 + j] = Matrix<T>(block_size, block_size);
             
             for (size_type bi = 0; bi < block_size; ++bi) {
                 for (size_type bj = 0; bj < block_size; ++bj) {
-                    A_blocks[i][j](bi, bj) = A_padded(i * block_size + bi, j * block_size + bj);
-                    B_blocks[i][j](bi, bj) = B_padded(i * block_size + bi, j * block_size + bj);
+                    A_blocks[i*4 + j](bi, bj) = A_padded(i * block_size + bi, j * block_size + bj);
+                    B_blocks[i*4 + j](bi, bj) = B_padded(i * block_size + bi, j * block_size + bj);
                 }
             }
         }
@@ -54,7 +54,7 @@ Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::split_and_multipl
             
             // Compute C[i][j] = sum(A[i][k] * B[k][j]) for k = 0 to 3
             for (size_type k = 0; k < 4; ++k) {
-                Matrix<T> temp = split_and_multiply(A_blocks[i][k], B_blocks[k][j]);
+                Matrix<T> temp = split_and_multiply(A_blocks[i*4 + k], B_blocks[k*4 + j]);
                 
                 if (k == 0) {
                     C_blocks[i * 4 + j] = temp;

@@ -259,16 +259,6 @@ int main(int argc, char* argv[]) {
         print_stats("Winograd Algorithm", winograd_stats);
         results.emplace_back("Winograd", winograd_stats);
         
-        // Hybrid algorithm
-        auto hybrid_stats = test_algorithm<double>(
-            "Hybrid Algorithm",
-            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::HYBRID,
-            num_iterations,
-            N
-        );
-        print_stats("Hybrid Algorithm", hybrid_stats);
-        results.emplace_back("Hybrid", hybrid_stats);
-        
         // Auto algorithm
         auto auto_stats = test_algorithm<double>(
             "Auto Algorithm",
@@ -282,7 +272,7 @@ int main(int argc, char* argv[]) {
         // AlphaTensor algorithm
         auto alphatensor_stats = test_algorithm<double>(
             "AlphaTensor Algorithm",
-            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::ALPHATENSOR,
+            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::ALPHA_TENSOR,
             num_iterations,
             N
         );

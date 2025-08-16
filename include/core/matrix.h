@@ -66,12 +66,10 @@ public:
             NAIVE,
             SIMD_NAIVE,
             ARM_NEON,
-            BLOCK,
             STRASSEN,
             WINOGRAD,
-            ALPHATENSOR,
-            HYBRID,
-            AUTO  // Automatically choose the best algorithm
+            ALPHA_TENSOR,
+            AUTO 
         };
 
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
@@ -154,11 +152,6 @@ public:
         
         private:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
-    };
-
-    class HybridMatrixMultiplicationAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
     class AutoMatrixMultiplicationAlgorithm {
@@ -282,7 +275,6 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/winograd_matrix_multiplication_algorithm.cpp"
-#include "../../src/core/matrix_multiplication_algorithms/hybrid_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/auto_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/alpha_tensor_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiply.cpp"

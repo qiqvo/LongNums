@@ -13,7 +13,6 @@ g++ -std=c++17 -O3 -march=native -Iinclude \
     src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/strassen_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/winograd_matrix_multiplication_algorithm.cpp \
-    src/core/matrix_multiplication_algorithms/hybrid_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/auto_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/alpha_tensor_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiply.cpp \
