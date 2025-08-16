@@ -4,18 +4,7 @@
 
 // StrassenMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    try {
-        DivideAndConquerMatrixMultiplicationAlgorithm::validate_divide_and_conquer_inputs(matrix, other);
-        return strassen_recursive(matrix, other);
-    } catch (const std::invalid_argument&) {
-        // Fall back to naive for non-square matrices
-        return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
-    }
-}
-
-template<typename T>
-Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_impl(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     // Use naive for small matrices to avoid overhead
@@ -24,11 +13,11 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
     }
     
     // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm::pad_to_power_of_2(A, B);
+    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
     
     if (A_padded.rows() != n) {
-        Matrix result_padded = strassen_recursive(A_padded, B_padded);
-        return DivideAndConquerMatrixMultiplicationAlgorithm::extract_from_padded(result_padded, n);
+        Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
+        return DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing
@@ -54,13 +43,13 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
     }
     
     // Strassen's seven multiplications
-    Matrix P1 = strassen_recursive(A11, B12 - B22);
-    Matrix P2 = strassen_recursive(A11 + A12, B22);
-    Matrix P3 = strassen_recursive(A21 + A22, B11);
-    Matrix P4 = strassen_recursive(A22, B21 - B11);
-    Matrix P5 = strassen_recursive(A11 + A22, B11 + B22);
-    Matrix P6 = strassen_recursive(A12 - A22, B21 + B22);
-    Matrix P7 = strassen_recursive(A11 - A21, B11 + B12);
+    Matrix P1 = recursive_multiply_impl(A11, B12 - B22);
+    Matrix P2 = recursive_multiply_impl(A11 + A12, B22);
+    Matrix P3 = recursive_multiply_impl(A21 + A22, B11);
+    Matrix P4 = recursive_multiply_impl(A22, B21 - B11);
+    Matrix P5 = recursive_multiply_impl(A11 + A22, B11 + B22);
+    Matrix P6 = recursive_multiply_impl(A12 - A22, B21 + B22);
+    Matrix P7 = recursive_multiply_impl(A11 - A21, B11 + B12);
     
     // Combine results
     Matrix C11 = P5 + P4 - P2 + P6;
@@ -83,7 +72,7 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_recursive(c
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_2x2(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply_2x2(const Matrix<T>& A, const Matrix<T>& B) {
     Matrix result(2, 2);
     
     // Direct 2x2 multiplication (Strassen's algorithm for 2x2)
@@ -102,6 +91,8 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_2x2(const M
     
     return result;
 }
+
+
 
 #endif // MATRIX_FUNCTIONS
 

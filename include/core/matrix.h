@@ -110,43 +110,48 @@ public:
         static Matrix block_multiply(const Matrix& A, const Matrix& B, size_type block_size);
     };
 
-    // Base class for divide-and-conquer matrix multiplication algorithms
+    // Base class for divide-and-conquer matrix multiplication algorithms using CRTP
+    template<typename Derived>
     class DivideAndConquerMatrixMultiplicationAlgorithm {
         public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        static Matrix multiply(const Matrix& matrix, const Matrix& other) {
+            try {
+                validate_divide_and_conquer_inputs(matrix, other);
+                return Derived::recursive_multiply_impl(matrix, other);
+            } catch (const std::invalid_argument&) {
+                // Fall back to naive for non-square matrices
+                return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
+            }
+        }
         
         protected:
         // Common validation for divide-and-conquer algorithms
         static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
         
-        // Helper method to pad matrices to next power of 2
-        static std::pair<Matrix, Matrix> pad_to_power_of_2(const Matrix& A, const Matrix& B);
+        // Helper method to pad odd-sized matrices with zeros
+        static std::pair<Matrix, Matrix> pad_odd_matrices(const Matrix& A, const Matrix& B);
         
         // Helper method to extract result from padded matrix
         static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
         
-        // Helper method to check if size is power of 2
-        static bool is_power_of_2(size_type n);
-        
-        // Helper method to get next power of 2
-        static size_type next_power_of_2(size_type n);
+        // Helper method to check if size is even
+        static bool is_even(size_type n);
     };
 
-    class StrassenMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm {
+    class StrassenMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
         
         private:
-        static Matrix strassen_recursive(const Matrix& A, const Matrix& B);
-        static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
+        static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
     };
 
-    class WinogradMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm {
+    class WinogradMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
+        
         private:
-        static Matrix winograd_recursive(const Matrix& A, const Matrix& B);
-        static Matrix winograd_2x2(const Matrix& A, const Matrix& B);
+        static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
     };
 
     class HybridMatrixMultiplicationAlgorithm {

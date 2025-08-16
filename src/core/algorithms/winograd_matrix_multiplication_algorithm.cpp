@@ -2,72 +2,43 @@
 #include "core/matrix.h"
 #else
 
-// WinogradMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
-    
-    if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
-        // Fall back to naive for non-square matrices
-        return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
-    }
-    
-    return WinogradMatrixMultiplicationAlgorithm::winograd_recursive(matrix, other);
-}
-
-
-// Private algorithm helper methods
-template<typename T>
-Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_recursive(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_impl(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     if (n <= 2) {
-        return WinogradMatrixMultiplicationAlgorithm::winograd_2x2(A, B);
+        return multiply_2x2(A, B);
     }
     
-    // Pad matrices to next power of 2 if necessary
-    size_type new_size = 1;
-    while (new_size < n) {
-        new_size *= 2;
+    // Use parent class helper methods for padding
+    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
+    
+    if (A_padded.rows() != n) {
+        Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
+        return DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
-    if (new_size != n) {
-        Matrix A_padded(new_size, new_size);
-        Matrix B_padded(new_size, new_size);
-        
-        // Copy original matrices
-        for (size_type i = 0; i < n; ++i) {
-            for (size_type j = 0; j < n; ++j) {
-                A_padded(i, j) = A(i, j);
-                B_padded(i, j) = B(i, j);
-            }
-        }
-        
-        Matrix result_padded = WinogradMatrixMultiplicationAlgorithm::winograd_recursive(A_padded, B_padded);
-        
-        // Extract result
-        Matrix result(n, n);
-        for (size_type i = 0; i < n; ++i) {
-            for (size_type j = 0; j < n; ++j) {
-                result(i, j) = result_padded(i, j);
-            }
-        }
-        
-        return result;
-    }
-    
-    // Split matrices into quadrants
+    // Split matrices into quadrants using direct indexing
     size_type half = n / 2;
     
-    Matrix A11 = A.submatrix(0, 0, half, half);
-    Matrix A12 = A.submatrix(0, half, half, n);
-    Matrix A21 = A.submatrix(half, 0, n, half);
-    Matrix A22 = A.submatrix(half, half, n, n);
+    // Create temporary matrices for the multiplications
+    Matrix<T> A11(half, half), A12(half, half), A21(half, half), A22(half, half);
+    Matrix<T> B11(half, half), B12(half, half), B21(half, half), B22(half, half);
     
-    Matrix B11 = B.submatrix(0, 0, half, half);
-    Matrix B12 = B.submatrix(0, half, half, n);
-    Matrix B21 = B.submatrix(half, 0, n, half);
-    Matrix B22 = B.submatrix(half, half, n, n);
+    // Copy quadrants using direct indexing (no submatrix overhead)
+    for (size_type i = 0; i < half; ++i) {
+        for (size_type j = 0; j < half; ++j) {
+            A11(i, j) = A(i, j);
+            A12(i, j) = A(i, j + half);
+            A21(i, j) = A(i + half, j);
+            A22(i, j) = A(i + half, j + half);
+            
+            B11(i, j) = B(i, j);
+            B12(i, j) = B(i, j + half);
+            B21(i, j) = B(i + half, j);
+            B22(i, j) = B(i + half, j + half);
+        }
+    }
     
     // Winograd's algorithm
     Matrix S1 = A21 + A22;
@@ -80,13 +51,13 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_recursive(c
     Matrix T3 = B22 - B12;
     Matrix T4 = T2 - B21;
     
-    Matrix P1 = WinogradMatrixMultiplicationAlgorithm::multiply(A11, B11);
-    Matrix P2 = WinogradMatrixMultiplicationAlgorithm::multiply(A12, B21);
-    Matrix P3 = WinogradMatrixMultiplicationAlgorithm::multiply(S4, B22);
-    Matrix P4 = WinogradMatrixMultiplicationAlgorithm::multiply(A22, T4);
-    Matrix P5 = WinogradMatrixMultiplicationAlgorithm::multiply(S1, T1);
-    Matrix P6 = WinogradMatrixMultiplicationAlgorithm::multiply(S2, T2);
-    Matrix P7 = WinogradMatrixMultiplicationAlgorithm::multiply(S3, T3);
+    Matrix P1 = recursive_multiply_impl(A11, B11);
+    Matrix P2 = recursive_multiply_impl(A12, B21);
+    Matrix P3 = recursive_multiply_impl(S4, B22);
+    Matrix P4 = recursive_multiply_impl(A22, T4);
+    Matrix P5 = recursive_multiply_impl(S1, T1);
+    Matrix P6 = recursive_multiply_impl(S2, T2);
+    Matrix P7 = recursive_multiply_impl(S3, T3);
     
     Matrix U1 = P1 + P2;
     Matrix U2 = P1 + P6;
@@ -96,18 +67,22 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_recursive(c
     Matrix U6 = U3 - P4;
     Matrix U7 = U3 + P5;
     
-    // Combine quadrants into result
+    // Combine quadrants into result using direct indexing
     Matrix result(n, n);
-    result.set_submatrix(0, 0, U1);
-    result.set_submatrix(0, half, U5);
-    result.set_submatrix(half, 0, U6);
-    result.set_submatrix(half, half, U7);
+    for (size_type i = 0; i < half; ++i) {
+        for (size_type j = 0; j < half; ++j) {
+            result(i, j) = U1(i, j);
+            result(i, j + half) = U5(i, j);
+            result(i + half, j) = U6(i, j);
+            result(i + half, j + half) = U7(i, j);
+        }
+    }
     
     return result;
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_2x2(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply_2x2(const Matrix<T>& A, const Matrix<T>& B) {
     Matrix result(2, 2);
     
     // Winograd's algorithm for 2x2 matrices
@@ -144,6 +119,9 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_2x2(const M
     
     return result;
 }
+
+
+
 
 #endif // MATRIX_FUNCTIONS
 
