@@ -136,6 +136,10 @@ public:
         
         // Helper method to check if size is even
         static bool is_even(size_type n);
+        
+        // Helper method to combine quadrants into result using direct indexing
+        static Matrix combine_quadrants(const Matrix& C11, const Matrix& C12, 
+                                       const Matrix& C21, const Matrix& C22, size_type n);
     };
 
     class StrassenMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm> {

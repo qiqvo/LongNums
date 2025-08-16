@@ -57,18 +57,8 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix C21 = P3 + P4;
     Matrix C22 = P5 + P1 - P3 - P7;
     
-    // Combine quadrants into result using direct indexing
-    Matrix result(n, n);
-    for (size_type i = 0; i < half; ++i) {
-        for (size_type j = 0; j < half; ++j) {
-            result(i, j) = C11(i, j);
-            result(i, j + half) = C12(i, j);
-            result(i + half, j) = C21(i, j);
-            result(i + half, j + half) = C22(i, j);
-        }
-    }
-    
-    return result;
+    // Use base class method to combine quadrants
+    return DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::combine_quadrants(C11, C12, C21, C22, n);
 }
 
 template<typename T>

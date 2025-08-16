@@ -67,6 +67,24 @@ bool Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::is_even(
     return n % 2 == 0;
 }
 
-
+template<typename T>
+template<typename Derived>
+Matrix<T> Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::combine_quadrants(const Matrix<T>& C11, const Matrix<T>& C12, 
+                                                                                               const Matrix<T>& C21, const Matrix<T>& C22, size_type n) {
+    // Combine quadrants into result using direct indexing
+    Matrix result(n, n);
+    size_type half = n / 2;
+    
+    for (size_type i = 0; i < half; ++i) {
+        for (size_type j = 0; j < half; ++j) {
+            result(i, j) = C11(i, j);
+            result(i, j + half) = C12(i, j);
+            result(i + half, j) = C21(i, j);
+            result(i + half, j + half) = C22(i, j);
+        }
+    }
+    
+    return result;
+}
 
 #endif // MATRIX_FUNCTIONS

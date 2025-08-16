@@ -67,18 +67,8 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix U6 = U3 - P4;
     Matrix U7 = U3 + P5;
     
-    // Combine quadrants into result using direct indexing
-    Matrix result(n, n);
-    for (size_type i = 0; i < half; ++i) {
-        for (size_type j = 0; j < half; ++j) {
-            result(i, j) = U1(i, j);
-            result(i, j + half) = U5(i, j);
-            result(i + half, j) = U6(i, j);
-            result(i + half, j + half) = U7(i, j);
-        }
-    }
-    
-    return result;
+    // Use base class method to combine quadrants
+    return DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::combine_quadrants(U1, U5, U6, U7, n);
 }
 
 template<typename T>
