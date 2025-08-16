@@ -113,4 +113,5 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::strassen_2x2(const M
     return result;
 }
 
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+

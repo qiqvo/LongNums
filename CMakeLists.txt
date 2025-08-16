@@ -20,13 +20,13 @@ set(SOURCES
     src/main.cpp
     src/core/long.cpp
     src/core/matrix_core.cpp
-    src/core/algorithms/algorithm_base.cpp
-    src/core/algorithms/naive_algorithm.cpp
-    src/core/algorithms/block_algorithm.cpp
-    src/core/algorithms/strassen_algorithm.cpp
-    src/core/algorithms/winograd_algorithm.cpp
-    src/core/algorithms/hybrid_algorithm.cpp
-    src/core/algorithms/auto_algorithm.cpp
+    src/core/algorithms/matrix_multiplication_algorithm_base.cpp
+    src/core/algorithms/naive_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/block_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/hybrid_matrix_multiplication_algorithm.cpp
+    src/core/algorithms/auto_matrix_multiplication_algorithm.cpp
     src/core/algorithms/alphatensor_algorithm.cpp
     src/core/matrix_multiply.cpp
     src/core/matrix_utils.cpp

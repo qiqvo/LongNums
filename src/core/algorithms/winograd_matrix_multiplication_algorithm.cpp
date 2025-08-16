@@ -145,4 +145,5 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::winograd_2x2(const M
     return result;
 }
 
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+

@@ -52,4 +52,5 @@ Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds() {
     return Matrix<T>::AutoMatrixMultiplicationAlgorithm::thresholds_;
 }
 
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+

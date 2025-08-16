@@ -30,4 +30,5 @@ Matrix<T> Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(const Matrix<T
     return result;
 }
 
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+

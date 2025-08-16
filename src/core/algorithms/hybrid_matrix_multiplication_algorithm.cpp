@@ -21,4 +21,5 @@ Matrix<T> Matrix<T>::HybridMatrixMultiplicationAlgorithm::multiply(const Matrix<
         return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
     }
 }
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+

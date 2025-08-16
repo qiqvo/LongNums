@@ -25,4 +25,5 @@ void Matrix<T>::MatrixMultiplicationAlgorithm::validate_dimensions(const Matrix<
     }
 }
 
-#endif // MATRIX_FUNCTIONS 
+#endif // MATRIX_FUNCTIONS
+
