@@ -102,17 +102,9 @@ public:
         static void neon_multiply_unaligned(const Matrix& A, const Matrix& B, Matrix& C);
     };
 
-    class BlockMatrixMultiplicationAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other, size_type block_size = 64);
-        
-        private:
-        static Matrix block_multiply(const Matrix& A, const Matrix& B, size_type block_size);
-    };
-
-    // Base class for divide-and-conquer matrix multiplication algorithms using CRTP
+    // Superbase class for block-based matrix multiplication algorithms using CRTP
     template<typename Derived>
-    class FourBlockMatrixMultiplicationAlgorithm {
+    class BlockMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other) {
             try {
@@ -128,14 +120,19 @@ public:
         // Common validation for divide-and-conquer algorithms
         static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
         
-        // Helper method to pad odd-sized matrices with zeros
-        static std::pair<Matrix, Matrix> pad_odd_matrices(const Matrix& A, const Matrix& B);
-        
         // Helper method to extract result from padded matrix
         static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
         
         // Helper method to check if size is even
         static bool is_even(size_type n);
+    };
+
+    // Base class for 4-block divide-and-conquer matrix multiplication algorithms using CRTP
+    template<typename Derived>
+    class FourBlockMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<Derived> {
+        protected:
+        // Helper method to pad odd-sized matrices with zeros
+        static std::pair<Matrix, Matrix> pad_odd_matrices(const Matrix& A, const Matrix& B);
         
         // Helper method to combine quadrants into result using direct indexing
         static Matrix combine_quadrants(const Matrix& C11, const Matrix& C12, 
@@ -144,27 +141,10 @@ public:
 
     // Base class for 16-block divide-and-conquer matrix multiplication algorithms using CRTP
     template<typename Derived>
-    class SixteenBlockMatrixMultiplicationAlgorithm {
-        public:
-        static Matrix multiply(const Matrix& matrix, const Matrix& other) {
-            try {
-                validate_divide_and_conquer_inputs(matrix, other);
-                return Derived::recursive_multiply_impl(matrix, other);
-            } catch (const std::invalid_argument&) {
-                // Fall back to naive for non-square matrices
-                return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
-            }
-        }
-        
+    class SixteenBlockMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<Derived> {
         protected:
-        // Common validation for divide-and-conquer algorithms
-        static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
-        
         // Helper method to pad matrices to be divisible by 4
         static std::pair<Matrix, Matrix> pad_matrices_for_16_blocks(const Matrix& A, const Matrix& B);
-        
-        // Helper method to extract result from padded matrix
-        static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
         
         // Helper method to check if size is divisible by 4
         static bool is_divisible_by_4(size_type n);
@@ -205,7 +185,7 @@ public:
         struct AutoMatrixMultiplicationAlgorithmThresholds {
             size_type naive_threshold = 64;
             size_type strassen_threshold = 512;
-            size_type block_size = 64;
+            size_type alpha_tensor_threshold = 1024;
         };
         
         static AutoMatrixMultiplicationAlgorithmThresholds get_thresholds();

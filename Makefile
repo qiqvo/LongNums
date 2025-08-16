@@ -30,7 +30,7 @@ TARGET = $(BINDIR)/LongNums
 PERFORMANCE_TEST = $(BINDIR)/performance_test
 
 # Default target
-all: release performance_test
+all: release $(PERFORMANCE_TEST)
 
 # Debug build
 debug: CXXFLAGS += $(DEBUG_FLAGS)

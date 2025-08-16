@@ -238,17 +238,6 @@ int main(int argc, char* argv[]) {
         print_stats("ARM NEON Algorithm", neon_stats);
         results.emplace_back("ARM NEON", neon_stats);
 #endif
-
-        // Block algorithm
-        auto block_stats = test_algorithm<double>(
-            "Block Algorithm",
-            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::BLOCK,
-            num_iterations,
-            N
-        );
-        print_stats("Block Algorithm", block_stats);
-        results.emplace_back("Block", block_stats);
-        
         // Strassen algorithm
         auto strassen_stats = test_algorithm<double>(
             "Strassen Algorithm",

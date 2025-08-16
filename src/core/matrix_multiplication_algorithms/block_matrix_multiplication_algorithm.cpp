@@ -2,33 +2,40 @@
 #include "core/matrix.h"
 #else
 
-// BlockMatrixMultiplicationAlgorithm class implementation
+// BlockMatrixMultiplicationAlgorithm superbase class implementation (CRTP)
+// Note: The multiply method is now implemented in the header as a template method
+
 template<typename T>
-Matrix<T> Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other, size_type block_size) {
+template<typename Derived>
+void Matrix<T>::BlockMatrixMultiplicationAlgorithm<Derived>::validate_divide_and_conquer_inputs(const Matrix<T>& matrix, const Matrix<T>& other) {
     MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
-    Matrix<T> result = Matrix<T>::MatrixMultiplicationAlgorithm::construct_result(matrix, other);
     
-    for (size_type i = 0; i < matrix.rows(); i += block_size) {
-        for (size_type j = 0; j < other.cols(); j += block_size) {
-            for (size_type k = 0; k < matrix.cols(); k += block_size) {
-                // Process block
-                size_type i_end = std::min(i + block_size, matrix.rows());
-                size_type j_end = std::min(j + block_size, other.cols());
-                size_type k_end = std::min(k + block_size, matrix.cols());
-                
-                for (size_type ii = i; ii < i_end; ++ii) {
-                    for (size_type jj = j; jj < j_end; ++jj) {
-                        for (size_type kk = k; kk < k_end; ++kk) {
-                            result(ii, jj) += matrix(ii, kk) * other(kk, jj);
-                        }
-                    }
-                }
-            }
+    if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
+        throw std::invalid_argument("Divide-and-conquer algorithms require square matrices of the same size");
+    }
+}
+
+template<typename T>
+template<typename Derived>
+Matrix<T> Matrix<T>::BlockMatrixMultiplicationAlgorithm<Derived>::extract_from_padded(const Matrix<T>& padded_result, size_type original_size) {
+    if (padded_result.rows() == original_size) {
+        return padded_result;
+    }
+    
+    Matrix<T> result(original_size, original_size);
+    for (size_type i = 0; i < original_size; ++i) {
+        for (size_type j = 0; j < original_size; ++j) {
+            result(i, j) = padded_result(i, j);
         }
     }
     
     return result;
 }
 
-#endif // MATRIX_FUNCTIONS
+template<typename T>
+template<typename Derived>
+bool Matrix<T>::BlockMatrixMultiplicationAlgorithm<Derived>::is_even(size_type n) {
+    return n % 2 == 0;
+}
 
+#endif // MATRIX_FUNCTIONS

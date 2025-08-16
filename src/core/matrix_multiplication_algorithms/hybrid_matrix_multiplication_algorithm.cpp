@@ -15,8 +15,6 @@ Matrix<T> Matrix<T>::HybridMatrixMultiplicationAlgorithm::multiply(const Matrix<
     
     if (size <= Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds().naive_threshold) {
         return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
-    } else if (size <= Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds().strassen_threshold) {
-        return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(matrix, other);
     } else {
         return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
     }
