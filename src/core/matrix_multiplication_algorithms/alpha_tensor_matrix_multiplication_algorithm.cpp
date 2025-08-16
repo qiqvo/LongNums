@@ -13,20 +13,78 @@ int Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::w[] = {0, 0, -1, 0, 0, 
 
 // AlphaTensorMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::multiply(const Matrix<T>& matrix, const Matrix<T>& other) {
-    Matrix<T>::MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
-
-    if (matrix.is_square() && other.is_square()) {
-        size_type n = matrix.rows();
-        if (n == 4) {
-            return AlphaTensorMatrixMultiplicationAlgorithm::alpha_tensor_4x4(matrix, other);
-        }
-        if (n == 2) {
-            return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
+Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::recursive_multiply_impl(const Matrix<T>& A, const Matrix<T>& B) {
+    size_type n = A.rows();
+    
+    // Base case: if matrix is 4x4, use AlphaTensor algorithm
+    if (n == 4) {
+        return alpha_tensor_4x4(A, B);
+    }
+    
+    // Base case: if matrix is 2x2, use Strassen algorithm
+    if (n == 2) {
+        return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(A, B);
+    }
+    
+    // Base case: if matrix is 1x1, use naive multiplication
+    if (n == 1) {
+        return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
+    }
+    
+    // Check if size is divisible by 4, if not pad the matrices
+    auto [A_padded, B_padded] = pad_matrices_for_16_blocks(A, B);
+    size_type padded_size = A_padded.rows();
+    size_type block_size = padded_size / 4;
+    
+    // Divide matrices into 16 blocks (4x4 grid)
+    Matrix<T> A_blocks[4][4];
+    Matrix<T> B_blocks[4][4];
+    
+    // Extract blocks from A
+    for (size_type i = 0; i < 4; ++i) {
+        for (size_type j = 0; j < 4; ++j) {
+            A_blocks[i][j] = Matrix<T>(block_size, block_size);
+            B_blocks[i][j] = Matrix<T>(block_size, block_size);
+            
+            for (size_type bi = 0; bi < block_size; ++bi) {
+                for (size_type bj = 0; bj < block_size; ++bj) {
+                    A_blocks[i][j](bi, bj) = A_padded(i * block_size + bi, j * block_size + bj);
+                    B_blocks[i][j](bi, bj) = B_padded(i * block_size + bi, j * block_size + bj);
+                }
+            }
         }
     }
-
-    return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
+    
+    // Compute result blocks using recursive calls
+    Matrix<T> C_blocks[4][4];
+    
+    for (size_type i = 0; i < 4; ++i) {
+        for (size_type j = 0; j < 4; ++j) {
+            C_blocks[i][j] = Matrix<T>(block_size, block_size);
+            
+            // Compute C[i][j] = sum(A[i][k] * B[k][j]) for k = 0 to 3
+            for (size_type k = 0; k < 4; ++k) {
+                Matrix<T> temp = recursive_multiply_impl(A_blocks[i][k], B_blocks[k][j]);
+                
+                if (k == 0) {
+                    C_blocks[i][j] = temp;
+                } else {
+                    // Add temp to C_blocks[i][j]
+                    for (size_type bi = 0; bi < block_size; ++bi) {
+                        for (size_type bj = 0; bj < block_size; ++bj) {
+                            C_blocks[i][j](bi, bj) += temp(bi, bj);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Combine blocks into result
+    Matrix<T> result = combine_16_blocks(C_blocks, padded_size);
+    
+    // Extract original size if padding was applied
+    return extract_from_padded(result, n);
 }
 
 template<typename T>
