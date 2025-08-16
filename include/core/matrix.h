@@ -103,13 +103,13 @@ public:
     };
 
     // Superbase class for block-based matrix multiplication algorithms using CRTP
-    template<typename Derived>
-    class BlockMatrixMultiplicationAlgorithm {
+    template<int block_num, typename Derived>
+    class BlockMatrixMultiplicationAlgorithm : public MatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other) {
             try {
                 validate_divide_and_conquer_inputs(matrix, other);
-                return Derived::recursive_multiply_impl(matrix, other);
+                return split_and_multiply(matrix, other);
             } catch (const std::invalid_argument&) {
                 // Fall back to naive for non-square matrices
                 return NaiveMatrixMultiplicationAlgorithm::multiply(matrix, other);
@@ -117,53 +117,36 @@ public:
         }
         
         protected:
+        static Matrix split_and_multiply(const Matrix& matrix, const Matrix& other) {
+            return Derived::split_and_multiply(matrix, other);
+        }
+
+        // Helper method to pad matrices to be divisible by 4
         // Common validation for divide-and-conquer algorithms
         static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
         
         // Helper method to extract result from padded matrix
         static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
-        
-        // Helper method to check if size is even
-        static bool is_even(size_type n);
-    };
 
-    // Base class for 4-block divide-and-conquer matrix multiplication algorithms using CRTP
-    template<typename Derived>
-    class FourBlockMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<Derived> {
-        protected:
         // Helper method to pad odd-sized matrices with zeros
-        static std::pair<Matrix, Matrix> pad_odd_matrices(const Matrix& A, const Matrix& B);
+        static std::pair<Matrix, Matrix> pad_matrices(const Matrix& A, const Matrix& B);
         
         // Helper method to combine quadrants into result using direct indexing
-        static Matrix combine_quadrants(const Matrix& C11, const Matrix& C12, 
-                                       const Matrix& C21, const Matrix& C22, size_type n);
+        static Matrix combine_blocks(const Matrix* blocks, size_type n);
+
     };
 
-    // Base class for 16-block divide-and-conquer matrix multiplication algorithms using CRTP
-    template<typename Derived>
-    class SixteenBlockMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<Derived> {
-        protected:
-        // Helper method to pad matrices to be divisible by 4
-        static std::pair<Matrix, Matrix> pad_matrices_for_16_blocks(const Matrix& A, const Matrix& B);
-        
-        // Helper method to check if size is divisible by 4
-        static bool is_divisible_by_4(size_type n);
-        
-        // Helper method to combine 16 blocks into result
-        static Matrix combine_16_blocks(const Matrix blocks[4][4], size_type n);
-    };
-
-    class StrassenMatrixMultiplicationAlgorithm : public FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm> {
+    class StrassenMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
+        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
         
         private:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
     };
 
-    class WinogradMatrixMultiplicationAlgorithm : public FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm> {
+    class WinogradMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
+        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
         
         private:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
@@ -179,7 +162,7 @@ public:
         public:
 
         // MatrixMultiplicationAlgorithm selection and configuration
-        static void set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_size);
+        static void set_thresholds(size_type naive_threshold, size_type strassen_threshold, size_type block_num);
         
         // Thresholds structure for algorithm configuration
         struct AutoMatrixMultiplicationAlgorithmThresholds {
@@ -195,9 +178,9 @@ public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
 
-    class AlphaTensorMatrixMultiplicationAlgorithm : public SixteenBlockMatrixMultiplicationAlgorithm<AlphaTensorMatrixMultiplicationAlgorithm> {
+    class AlphaTensorMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
+        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
         
         private:
         static const int p_size_n = 16;
@@ -293,8 +276,6 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/matrix_multiplication_algorithms/simd_naive_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp"
-#include "../../src/core/matrix_multiplication_algorithms/four_block_matrix_multiplication_algorithm.cpp"
-#include "../../src/core/matrix_multiplication_algorithms/sixteen_block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/winograd_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/hybrid_matrix_multiplication_algorithm.cpp"

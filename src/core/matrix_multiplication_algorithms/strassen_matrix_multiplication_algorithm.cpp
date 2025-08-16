@@ -4,7 +4,7 @@
 
 // StrassenMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_impl(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::split_and_multiply(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     // Use naive for small matrices to avoid overhead
@@ -13,11 +13,11 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     }
     
     // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
+    auto [A_padded, B_padded] = BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::pad_matrices(A, B);
     
     if (A_padded.rows() != n) {
-        Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
-        return FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
+        Matrix result_padded = split_and_multiply(A_padded, B_padded);
+        return BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing
@@ -43,13 +43,13 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     }
     
     // Strassen's seven multiplications
-    Matrix P1 = recursive_multiply_impl(A11, B12 - B22);
-    Matrix P2 = recursive_multiply_impl(A11 + A12, B22);
-    Matrix P3 = recursive_multiply_impl(A21 + A22, B11);
-    Matrix P4 = recursive_multiply_impl(A22, B21 - B11);
-    Matrix P5 = recursive_multiply_impl(A11 + A22, B11 + B22);
-    Matrix P6 = recursive_multiply_impl(A12 - A22, B21 + B22);
-    Matrix P7 = recursive_multiply_impl(A11 - A21, B11 + B12);
+    Matrix P1 = split_and_multiply(A11, B12 - B22);
+    Matrix P2 = split_and_multiply(A11 + A12, B22);
+    Matrix P3 = split_and_multiply(A21 + A22, B11);
+    Matrix P4 = split_and_multiply(A22, B21 - B11);
+    Matrix P5 = split_and_multiply(A11 + A22, B11 + B22);
+    Matrix P6 = split_and_multiply(A12 - A22, B21 + B22);
+    Matrix P7 = split_and_multiply(A11 - A21, B11 + B12);
     
     // Combine results
     Matrix C11 = P5 + P4 - P2 + P6;
@@ -58,7 +58,8 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix C22 = P5 + P1 - P3 - P7;
     
     // Use base class method to combine quadrants
-    return FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::combine_quadrants(C11, C12, C21, C22, n);
+    Matrix<T> blocks[4] = {C11, C12, C21, C22};
+    return BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::combine_blocks(blocks, n);
 }
 
 template<typename T>

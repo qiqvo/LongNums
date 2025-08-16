@@ -3,19 +3,19 @@
 #else
 
 template<typename T>
-Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_impl(const Matrix<T>& A, const Matrix<T>& B) {
+Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::split_and_multiply(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
-    if (n <= 2) {
-        return multiply_2x2(A, B);
+    if (n <= 16) {
+        return NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
     }
     
     // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
+    auto [A_padded, B_padded] = BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::pad_matrices(A, B);
     
     if (A_padded.rows() != n) {
-        Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
-        return FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
+        Matrix result_padded = split_and_multiply(A_padded, B_padded);
+        return BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing
@@ -51,13 +51,13 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix T3 = B22 - B12;
     Matrix T4 = T2 - B21;
     
-    Matrix P1 = recursive_multiply_impl(A11, B11);
-    Matrix P2 = recursive_multiply_impl(A12, B21);
-    Matrix P3 = recursive_multiply_impl(S4, B22);
-    Matrix P4 = recursive_multiply_impl(A22, T4);
-    Matrix P5 = recursive_multiply_impl(S1, T1);
-    Matrix P6 = recursive_multiply_impl(S2, T2);
-    Matrix P7 = recursive_multiply_impl(S3, T3);
+    Matrix P1 = split_and_multiply(A11, B11);
+    Matrix P2 = split_and_multiply(A12, B21);
+    Matrix P3 = split_and_multiply(S4, B22);
+    Matrix P4 = split_and_multiply(A22, T4);
+    Matrix P5 = split_and_multiply(S1, T1);
+    Matrix P6 = split_and_multiply(S2, T2);
+    Matrix P7 = split_and_multiply(S3, T3);
     
     Matrix U1 = P1 + P2;
     Matrix U2 = P1 + P6;
@@ -68,7 +68,8 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix U7 = U3 + P5;
     
     // Use base class method to combine quadrants
-    return FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::combine_quadrants(U1, U5, U6, U7, n);
+    Matrix<T> blocks[4] = {U1, U5, U6, U7};
+    return BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::combine_blocks(blocks, n);
 }
 
 template<typename T>
