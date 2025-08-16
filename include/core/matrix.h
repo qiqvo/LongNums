@@ -43,7 +43,9 @@ public:
     
     // Arithmetic operators
     Matrix operator+(const Matrix& other) const;
+    Matrix operator+(value_type scalar) const;
     Matrix operator-(const Matrix& other) const;
+    Matrix operator-(value_type scalar) const;
     Matrix operator*(const Matrix& other) const;
     Matrix operator*(value_type scalar) const;
     Matrix& operator+=(const Matrix& other);
@@ -183,9 +185,14 @@ private:
     // Helper methods
     size_type index(size_type row, size_type col) const;
     void check_bounds(size_type row, size_type col) const;
+    void check_dimensions(const Matrix& other, const std::string& operation) const;
 };
 
 // Free functions
+template<typename T>
+Matrix<T> operator+(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix);
+template<typename T>
+Matrix<T> operator-(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix);
 template<typename T>
 Matrix<T> operator*(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix);
 

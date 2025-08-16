@@ -153,6 +153,22 @@ const std::vector<typename Matrix<T>::value_type>& Matrix<T>::get_data() const {
 
 // Free functions
 template<typename T>
+Matrix<T> operator+(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix) {
+    return matrix + scalar;
+}
+
+template<typename T>
+Matrix<T> operator-(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix) {
+    Matrix<T> result(matrix.rows(), matrix.cols());
+    for (typename Matrix<T>::size_type i = 0; i < matrix.rows(); ++i) {
+        for (typename Matrix<T>::size_type j = 0; j < matrix.cols(); ++j) {
+            result(i, j) = scalar - matrix(i, j);
+        }
+    }
+    return result;
+}
+
+template<typename T>
 Matrix<T> operator*(typename Matrix<T>::value_type scalar, const Matrix<T>& matrix) {
     return matrix * scalar;
 }

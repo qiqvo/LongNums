@@ -55,6 +55,24 @@ Matrix<T> Matrix<T>::operator+(const Matrix& other) const {
 }
 
 template<typename T>
+Matrix<T> Matrix<T>::operator+(value_type scalar) const {
+    Matrix result(rows_, cols_);
+    for (size_type i = 0; i < data_.size(); ++i) {
+        result.data_[i] = data_[i] + scalar;
+    }
+    return result;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::operator-(value_type scalar) const {
+    Matrix result(rows_, cols_);
+    for (size_type i = 0; i < data_.size(); ++i) {
+        result.data_[i] = data_[i] - scalar;
+    }
+    return result;
+}
+
+template<typename T>
 Matrix<T> Matrix<T>::operator-(const Matrix& other) const {
     if (rows_ != other.rows_ || cols_ != other.cols_) {
         throw std::invalid_argument("Matrix dimensions must match for subtraction");
@@ -173,6 +191,13 @@ template<typename T>
 void Matrix<T>::check_bounds(size_type row, size_type col) const {
     if (row >= rows_ || col >= cols_) {
         throw std::out_of_range("Matrix index out of bounds");
+    }
+}
+
+template<typename T>
+void Matrix<T>::check_dimensions(const Matrix& other, const std::string& operation) const {
+    if (rows_ != other.rows_ || cols_ != other.cols_) {
+        throw std::invalid_argument("Matrix dimensions must match for " + operation);
     }
 }
 
