@@ -244,16 +244,7 @@ int main(int argc, char* argv[]) {
         );
         print_stats("Strassen Algorithm", strassen_stats);
         
-        // New Strassen algorithm
-        auto new_strassen_stats = test_algorithm<double>(
-            "New Strassen Algorithm",
-            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::NEW_STRASSEN,
-            num_iterations,
-            N
-        );
-        print_stats("New Strassen Algorithm", new_strassen_stats);
         results.emplace_back("Strassen", strassen_stats);
-        results.emplace_back("New Strassen", new_strassen_stats);
         
         // Winograd algorithm
         auto winograd_stats = test_algorithm<double>(
