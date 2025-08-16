@@ -112,7 +112,7 @@ public:
 
     // Base class for divide-and-conquer matrix multiplication algorithms using CRTP
     template<typename Derived>
-    class DivideAndConquerMatrixMultiplicationAlgorithm {
+    class FourBlockMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other) {
             try {
@@ -142,7 +142,7 @@ public:
                                        const Matrix& C21, const Matrix& C22, size_type n);
     };
 
-    class StrassenMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm> {
+    class StrassenMatrixMultiplicationAlgorithm : public FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm> {
         public:
         static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
         
@@ -150,7 +150,7 @@ public:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
     };
 
-    class WinogradMatrixMultiplicationAlgorithm : public DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm> {
+    class WinogradMatrixMultiplicationAlgorithm : public FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm> {
         public:
         static Matrix recursive_multiply_impl(const Matrix& A, const Matrix& B);
         
@@ -281,7 +281,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/algorithms/simd_naive_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/block_matrix_multiplication_algorithm.cpp"
-#include "../../src/core/algorithms/divide_and_conquer_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/algorithms/four_block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/hybrid_matrix_multiplication_algorithm.cpp"

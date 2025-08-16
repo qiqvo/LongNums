@@ -13,11 +13,11 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     }
     
     // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
+    auto [A_padded, B_padded] = FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
     
     if (A_padded.rows() != n) {
         Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
-        return DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
+        return FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing
@@ -58,7 +58,7 @@ Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix C22 = P5 + P1 - P3 - P7;
     
     // Use base class method to combine quadrants
-    return DivideAndConquerMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::combine_quadrants(C11, C12, C21, C22, n);
+    return FourBlockMatrixMultiplicationAlgorithm<StrassenMatrixMultiplicationAlgorithm>::combine_quadrants(C11, C12, C21, C22, n);
 }
 
 template<typename T>

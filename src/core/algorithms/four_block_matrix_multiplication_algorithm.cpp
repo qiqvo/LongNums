@@ -2,12 +2,12 @@
 #include "core/matrix.h"
 #else
 
-// DivideAndConquerMatrixMultiplicationAlgorithm class implementation (CRTP)
+// FourBlockMatrixMultiplicationAlgorithm class implementation (CRTP)
 // Note: The multiply method is now implemented in the header as a template method
 
 template<typename T>
 template<typename Derived>
-void Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::validate_divide_and_conquer_inputs(const Matrix<T>& matrix, const Matrix<T>& other) {
+void Matrix<T>::FourBlockMatrixMultiplicationAlgorithm<Derived>::validate_divide_and_conquer_inputs(const Matrix<T>& matrix, const Matrix<T>& other) {
     MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
     
     if (!matrix.is_square() || !other.is_square() || matrix.rows() != other.rows()) {
@@ -17,7 +17,7 @@ void Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::validate
 
 template<typename T>
 template<typename Derived>
-std::pair<Matrix<T>, Matrix<T>> Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::pad_odd_matrices(const Matrix<T>& A, const Matrix<T>& B) {
+std::pair<Matrix<T>, Matrix<T>> Matrix<T>::FourBlockMatrixMultiplicationAlgorithm<Derived>::pad_odd_matrices(const Matrix<T>& A, const Matrix<T>& B) {
     size_type n = A.rows();
     
     // If size is even, no padding needed
@@ -46,7 +46,7 @@ std::pair<Matrix<T>, Matrix<T>> Matrix<T>::DivideAndConquerMatrixMultiplicationA
 
 template<typename T>
 template<typename Derived>
-Matrix<T> Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::extract_from_padded(const Matrix<T>& padded_result, size_type original_size) {
+Matrix<T> Matrix<T>::FourBlockMatrixMultiplicationAlgorithm<Derived>::extract_from_padded(const Matrix<T>& padded_result, size_type original_size) {
     if (padded_result.rows() == original_size) {
         return padded_result;
     }
@@ -63,13 +63,13 @@ Matrix<T> Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::ext
 
 template<typename T>
 template<typename Derived>
-bool Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::is_even(size_type n) {
+bool Matrix<T>::FourBlockMatrixMultiplicationAlgorithm<Derived>::is_even(size_type n) {
     return n % 2 == 0;
 }
 
 template<typename T>
 template<typename Derived>
-Matrix<T> Matrix<T>::DivideAndConquerMatrixMultiplicationAlgorithm<Derived>::combine_quadrants(const Matrix<T>& C11, const Matrix<T>& C12, 
+Matrix<T> Matrix<T>::FourBlockMatrixMultiplicationAlgorithm<Derived>::combine_quadrants(const Matrix<T>& C11, const Matrix<T>& C12, 
                                                                                                const Matrix<T>& C21, const Matrix<T>& C22, size_type n) {
     // Combine quadrants into result using direct indexing
     Matrix result(n, n);

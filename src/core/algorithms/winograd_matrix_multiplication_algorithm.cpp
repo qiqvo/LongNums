@@ -11,11 +11,11 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_i
     }
     
     // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
+    auto [A_padded, B_padded] = FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::pad_odd_matrices(A, B);
     
     if (A_padded.rows() != n) {
         Matrix result_padded = recursive_multiply_impl(A_padded, B_padded);
-        return DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
+        return FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
     }
     
     // Split matrices into quadrants using direct indexing
@@ -68,7 +68,7 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::recursive_multiply_i
     Matrix U7 = U3 + P5;
     
     // Use base class method to combine quadrants
-    return DivideAndConquerMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::combine_quadrants(U1, U5, U6, U7, n);
+    return FourBlockMatrixMultiplicationAlgorithm<WinogradMatrixMultiplicationAlgorithm>::combine_quadrants(U1, U5, U6, U7, n);
 }
 
 template<typename T>
