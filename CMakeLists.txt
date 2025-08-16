@@ -40,6 +40,7 @@ set(SOURCES
     src/core/matrix_multiplication_algorithms/winograd_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/hybrid_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/auto_matrix_multiplication_algorithm.cpp
+    src/core/matrix_multiplication_algorithms/sixteen_block_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/alpha_tensor_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiply.cpp
     src/core/matrix_utils.cpp

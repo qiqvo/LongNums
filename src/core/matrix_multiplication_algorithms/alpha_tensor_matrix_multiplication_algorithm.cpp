@@ -32,7 +32,7 @@ Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::recursive_multipl
     }
     
     // Check if size is divisible by 4, if not pad the matrices
-    auto [A_padded, B_padded] = pad_matrices_for_16_blocks(A, B);
+    auto [A_padded, B_padded] = AlphaTensorMatrixMultiplicationAlgorithm::pad_matrices_for_16_blocks(A, B);
     size_type padded_size = A_padded.rows();
     size_type block_size = padded_size / 4;
     
@@ -81,10 +81,10 @@ Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::recursive_multipl
     }
     
     // Combine blocks into result
-    Matrix<T> result = combine_16_blocks(C_blocks, padded_size);
+    Matrix<T> result = AlphaTensorMatrixMultiplicationAlgorithm::combine_16_blocks(C_blocks, padded_size);
     
     // Extract original size if padding was applied
-    return extract_from_padded(result, n);
+    return AlphaTensorMatrixMultiplicationAlgorithm::extract_from_padded(result, n);
 }
 
 template<typename T>
