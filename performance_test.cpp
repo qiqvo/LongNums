@@ -124,11 +124,18 @@ void compare_algorithms(const std::vector<std::pair<std::string, PerformanceStat
     std::cout << "ALGORITHM COMPARISON" << std::endl;
     std::cout << std::string(80, '=') << std::endl;
     
-    // Find the fastest algorithm
-    auto fastest = std::min_element(results.begin(), results.end(),
-        [](const auto& a, const auto& b) {
-            return a.second.mean_time < b.second.mean_time;
+    // Find the Naive algorithm as baseline
+    auto naive_it = std::find_if(results.begin(), results.end(),
+        [](const auto& a) {
+            return a.first == "Naive";
         });
+    
+    if (naive_it == results.end()) {
+        std::cout << "Error: Naive algorithm not found for comparison baseline" << std::endl;
+        return;
+    }
+    
+    double naive_time = naive_it->second.mean_time;
     
     std::cout << std::fixed << std::setprecision(3);
     std::cout << std::setw(20) << "Algorithm" 
@@ -139,8 +146,8 @@ void compare_algorithms(const std::vector<std::pair<std::string, PerformanceStat
     std::cout << std::string(80, '-') << std::endl;
     
     for (const auto& [name, stats] : results) {
-        double speedup = fastest->second.mean_time / stats.mean_time;
-        double efficiency = speedup * 100.0; // Efficiency as percentage of fastest
+        double speedup = naive_time / stats.mean_time;
+        double efficiency = speedup * 100.0; // Efficiency as percentage of naive
         
         std::cout << std::setw(20) << name
                   << std::setw(12) << stats.mean_time
@@ -149,8 +156,15 @@ void compare_algorithms(const std::vector<std::pair<std::string, PerformanceStat
                   << std::setw(12) << efficiency << "%" << std::endl;
     }
     
+    // Find the fastest algorithm for summary
+    auto fastest = std::min_element(results.begin(), results.end(),
+        [](const auto& a, const auto& b) {
+            return a.second.mean_time < b.second.mean_time;
+        });
+    
     std::cout << "\nFastest algorithm: " << fastest->first << std::endl;
     std::cout << "Best mean time: " << fastest->second.mean_time << " ms" << std::endl;
+    std::cout << "Baseline (Naive): " << naive_time << " ms" << std::endl;
 }
 
 int main(int argc, char* argv[]) {

@@ -12,16 +12,23 @@ x86/
 *.out
 LongNums
 LongNums.exe
+performance_test
+test_*
+debug_*
 
-# Object files
+# Object files (all extensions)
 *.o
 *.obj
+*.lo
+*.a
+*.so
+*.dylib
 
 # CMake generated files
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-# Makefile
+Makefile
 
 # IDE files
 .vscode/

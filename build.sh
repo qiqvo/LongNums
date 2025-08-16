@@ -129,6 +129,19 @@ case "${1:-release}" in
     "run")
         run_program
         ;;
+    "performance-test")
+        print_status "Building and running performance test..."
+        if [ -f "performance_test" ] || [ -f "build/bin/performance_test" ]; then
+            if [ -f "performance_test" ]; then
+                ./performance_test
+            else
+                ./build/bin/performance_test
+            fi
+        else
+            print_error "Performance test not found. Please build the project first."
+            exit 1
+        fi
+        ;;
     "simd-test")
         print_status "Building and running SIMD optimization test..."
         if [ -f "compile_simd_test.sh" ]; then
@@ -157,6 +170,7 @@ case "${1:-release}" in
         echo "  make-release  - Build with Makefile in release mode"
         echo "  clean         - Clean all build artifacts"
         echo "  run           - Run the program"
+        echo "  performance-test - Run the performance test"
         echo "  simd-test     - Build and run SIMD optimization test"
         echo "  help          - Show this help message"
         echo ""
@@ -165,6 +179,7 @@ case "${1:-release}" in
         echo "  $0 debug        # Build debug with CMake"
         echo "  $0 make-release # Build release with Makefile"
         echo "  $0 run          # Run the program"
+        echo "  $0 performance-test # Run performance test"
         ;;
     *)
         print_error "Unknown option: $1"
