@@ -115,6 +115,26 @@ Matrix<T>& Matrix<T>::operator*=(value_type scalar) {
     return *this;
 }
 
+// Comparison operators
+template<typename T>
+bool Matrix<T>::operator==(const Matrix& other) const {
+    if (rows_ != other.rows_ || cols_ != other.cols_) {
+        return false;
+    }
+    
+    for (size_type i = 0; i < data_.size(); ++i) {
+        if (data_[i] != other.data_[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename T>
+bool Matrix<T>::operator!=(const Matrix& other) const {
+    return !(*this == other);
+}
+
 template<typename T>
 Matrix<T> Matrix<T>::operator*(value_type scalar) const {
     Matrix result(rows_, cols_);

@@ -52,6 +52,10 @@ public:
     Matrix& operator-=(const Matrix& other);
     Matrix& operator*=(value_type scalar);
     
+    // Comparison operators
+    bool operator==(const Matrix& other) const;
+    bool operator!=(const Matrix& other) const;
+    
     class MatrixMultiplicationAlgorithm {
         public:
         static Matrix construct_result(const Matrix& matrix, const Matrix& other);
