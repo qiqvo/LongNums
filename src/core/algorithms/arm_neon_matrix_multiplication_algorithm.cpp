@@ -11,8 +11,6 @@ Matrix<T> Matrix<T>::ArmNeonMatrixMultiplicationAlgorithm::multiply(const Matrix
     Matrix<T>::MatrixMultiplicationAlgorithm::validate_dimensions(matrix, other);
     Matrix<T> result = Matrix<T>::MatrixMultiplicationAlgorithm::construct_result(matrix, other);
     
-    const size_type rows = matrix.rows();
-    const size_type cols = other.cols();
     const size_type inner_dim = matrix.cols();
     
     // For double precision, we can process 2 elements at once with NEON
