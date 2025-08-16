@@ -215,6 +215,8 @@ Matrix<T> Matrix<T>::multiply(const Matrix& other, typename Matrix<T>::MatrixMul
             return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(*this, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::STRASSEN:
             return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(*this, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::NEW_STRASSEN:
+            return Matrix<T>::NewStrassenMatrixMultiplicationAlgorithm::multiply(*this, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::WINOGRAD:
             return Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply(*this, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::HYBRID:

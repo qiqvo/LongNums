@@ -64,6 +64,7 @@ public:
             ARM_NEON,
             BLOCK,
             STRASSEN,
+            NEW_STRASSEN,
             WINOGRAD,
             ALPHATENSOR,
             HYBRID,
@@ -113,11 +114,21 @@ public:
         
         private:
         static Matrix strassen_recursive(const Matrix& A, const Matrix& B);
+        static Matrix strassen_recursive_optimized(const Matrix& A, const Matrix& B);
         static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
         static Matrix strassen_recursive_quadrant(const Matrix& A, const Matrix& B,
             size_type a_start_row, size_type a_start_col, size_type a_end_row, size_type a_end_col,
             size_type b_start_row, size_type b_start_col, size_type b_end_row, size_type b_end_col,
             int a_op, int b_op);
+    };
+
+    class NewStrassenMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+        
+        private:
+        static Matrix strassen_recursive(const Matrix& A, const Matrix& B);
+        static Matrix strassen_2x2(const Matrix& A, const Matrix& B);
     };
 
     class WinogradMatrixMultiplicationAlgorithm {
@@ -252,6 +263,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/block_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/strassen_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/algorithms/new_strassen_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/winograd_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/hybrid_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/algorithms/auto_matrix_multiplication_algorithm.cpp"

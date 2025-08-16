@@ -17,6 +17,8 @@ Matrix<T> Matrix<T>::AutoMatrixMultiplicationAlgorithm::multiply(const Matrix<T>
             return Matrix<T>::BlockMatrixMultiplicationAlgorithm::multiply(matrix, other, Matrix<T>::AutoMatrixMultiplicationAlgorithm::get_thresholds().block_size);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::STRASSEN:
             return Matrix<T>::StrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
+        case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::NEW_STRASSEN:
+            return Matrix<T>::NewStrassenMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::WINOGRAD:
             return Matrix<T>::WinogradMatrixMultiplicationAlgorithm::multiply(matrix, other);
         case Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType::HYBRID:
