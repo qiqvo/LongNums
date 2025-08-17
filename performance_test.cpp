@@ -215,6 +215,16 @@ int main(int argc, char* argv[]) {
         print_stats("Naive Algorithm", naive_stats);
         results.emplace_back("Naive", naive_stats);
         
+        // Naive Transposed algorithm
+        auto naive_transposed_stats = test_algorithm<double>(
+            "Naive Transposed Algorithm",
+            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::NAIVE_TRANSPOSED,
+            num_iterations,
+            N
+        );
+        print_stats("Naive Transposed Algorithm", naive_transposed_stats);
+        results.emplace_back("Naive Transposed", naive_transposed_stats);
+        
         // SIMD Naive (x86)
 #ifdef __AVX2__
         auto simd_stats = test_algorithm<double>(

@@ -64,6 +64,7 @@ public:
         // MatrixMultiplicationAlgorithm types for matrix multiplication
         enum class AlgorithmType {
             NAIVE,
+            NAIVE_TRANSPOSED,
             SIMD_NAIVE,
             ARM_NEON,
             STRASSEN,
@@ -76,6 +77,11 @@ public:
     };
 
     class NaiveMatrixMultiplicationAlgorithm {
+        public:
+        static Matrix multiply(const Matrix& matrix, const Matrix& other);
+    };
+
+    class NaiveTransposedMatrixMultiplicationAlgorithm {
         public:
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
     };
@@ -269,6 +275,7 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/matrix_core.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/naive_matrix_multiplication_algorithm.cpp"
+#include "../../src/core/matrix_multiplication_algorithms/naive_transposed_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/simd_naive_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/arm_neon_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp"

@@ -8,6 +8,7 @@ g++ -std=c++17 -O3 -mavx2 -mfma -Iinclude \
     src/core/matrix_core.cpp \
     src/core/matrix_multiplication_algorithms/matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/naive_matrix_multiplication_algorithm.cpp \
+    src/core/matrix_multiplication_algorithms/naive_transposed_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/simd_naive_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp \
     src/core/matrix_multiplication_algorithms/strassen_matrix_multiplication_algorithm.cpp \

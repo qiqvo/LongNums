@@ -34,6 +34,7 @@ set(SOURCES
     src/core/matrix_multiplication_algorithms/matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/block_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/naive_matrix_multiplication_algorithm.cpp
+    src/core/matrix_multiplication_algorithms/naive_transposed_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/simd_naive_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/arm_neon_matrix_multiplication_algorithm.cpp
     src/core/matrix_multiplication_algorithms/strassen_matrix_multiplication_algorithm.cpp
