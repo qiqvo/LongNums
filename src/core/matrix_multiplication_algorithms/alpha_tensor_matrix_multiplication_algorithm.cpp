@@ -13,68 +13,40 @@ int Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::w[] = {0, 0, -1, 0, 0, 
 
 // AlphaTensorMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::split_and_multiply(const Matrix<T>& A, const Matrix<T>& B) {
-    size_type n = A.rows();
-    
-    // Base case: if matrix is 1x1, use naive multiplication
-    if (n <= 16) {
-        return Matrix<T>::NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
-    }
-    
-    // Check if size is divisible by 4, if not pad the matrices
-    auto [A_padded, B_padded] = BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm>::pad_matrices(A, B);
-    size_type padded_size = A_padded.rows();
-    size_type block_size = padded_size / 4;
-    
-    // Divide matrices into 16 blocks (4x4 grid)
-    Matrix<T> A_blocks[16];
-    Matrix<T> B_blocks[16];
-    
-    // Extract blocks from A
-    for (size_type i = 0; i < 4; ++i) {
-        for (size_type j = 0; j < 4; ++j) {
-            A_blocks[i*4 + j] = Matrix<T>(block_size, block_size);
-            B_blocks[i*4 + j] = Matrix<T>(block_size, block_size);
-            
-            for (size_type bi = 0; bi < block_size; ++bi) {
-                for (size_type bj = 0; bj < block_size; ++bj) {
-                    A_blocks[i*4 + j](bi, bj) = A_padded(i * block_size + bi, j * block_size + bj);
-                    B_blocks[i*4 + j](bi, bj) = B_padded(i * block_size + bi, j * block_size + bj);
-                }
-            }
-        }
-    }
-    
+Matrix<T>* Matrix<T>::AlphaTensorMatrixMultiplicationAlgorithm::compute_from_blocks(const Matrix<T>* A_blocks, const Matrix<T>* B_blocks) {
     // Compute result blocks using recursive calls
-    Matrix<T> C_blocks[16];
+    Matrix<T>* C_blocks = new Matrix<T>[16];
+
+    Matrix<T> m_array[p_size_m];
     
-    for (size_type i = 0; i < 4; ++i) {
-        for (size_type j = 0; j < 4; ++j) {
-            C_blocks[i * 4 + j] = Matrix<T>(block_size, block_size);
-            
-            // Compute C[i][j] = sum(A[i][k] * B[k][j]) for k = 0 to 3
-            for (size_type k = 0; k < 4; ++k) {
-                Matrix<T> temp = split_and_multiply(A_blocks[i*4 + k], B_blocks[k*4 + j]);
-                
-                if (k == 0) {
-                    C_blocks[i * 4 + j] = temp;
-                } else {
-                    // Add temp to C_blocks[i][j]
-                    for (size_type bi = 0; bi < block_size; ++bi) {
-                        for (size_type bj = 0; bj < block_size; ++bj) {
-                            C_blocks[i * 4 + j](bi, bj) += temp(bi, bj);
-                        }
-                    }
-                }
+    // Define n and m based on the block structure (4x4 blocks)
+    size_type n = 4;  // 4 blocks per row
+    size_type m = 4;  // 4 blocks per column
+    
+    for (size_type r = 0; r < p_size_m; ++r){
+        Matrix<T> res_1 = Matrix<T>(A_blocks[0].rows(), A_blocks[0].cols());
+        Matrix<T> res_2 = Matrix<T>(B_blocks[0].rows(), B_blocks[0].cols());
+        for (size_type i = 0; i < n; ++i){
+            for (size_type j = 0; j < m; ++j){
+                auto pos = (i * 4 + j) * p_size_m + r;
+                res_1 += A_blocks[i * 4 + j] * u[pos];
+                res_2 += B_blocks[i * 4 + j] * v[pos];
+            }
+        }
+        m_array[r] = res_1 * res_2;
+    }
+
+    for (size_type i = 0; i < 4; ++i){
+        for (size_type j = 0; j < 4; ++j){
+            auto pos = (i * 4 + j) * p_size_m;
+            C_blocks[j * 4 + i] = Matrix<T>(A_blocks[0].rows(), B_blocks[0].cols());
+            for (size_type r = 0; r < p_size_m; ++r){
+                C_blocks[j * 4 + i] += m_array[r] * w[pos + r];
             }
         }
     }
-    
-    // Combine blocks into result
-    Matrix<T> result = BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm>::combine_blocks(C_blocks, padded_size);
-    
-    // Extract original size if padding was applied
-    return BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm>::extract_from_padded(result, n);
+
+    return C_blocks;
 }
 
 template<typename T>

@@ -259,15 +259,15 @@ int main(int argc, char* argv[]) {
         print_stats("Winograd Algorithm", winograd_stats);
         results.emplace_back("Winograd", winograd_stats);
         
-        // Auto algorithm
-        auto auto_stats = test_algorithm<double>(
-            "Auto Algorithm",
-            Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO,
-            num_iterations,
-            N
-        );
-        print_stats("Auto Algorithm", auto_stats);
-        results.emplace_back("Auto", auto_stats);
+        // // Auto algorithm
+        // auto auto_stats = test_algorithm<double>(
+        //     "Auto Algorithm",
+        //     Matrix<double>::MatrixMultiplicationAlgorithm::AlgorithmType::AUTO,
+        //     num_iterations,
+        //     N
+        // );
+        // print_stats("Auto Algorithm", auto_stats);
+        // results.emplace_back("Auto", auto_stats);
         
         // AlphaTensor algorithm
         auto alphatensor_stats = test_algorithm<double>(

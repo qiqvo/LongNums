@@ -3,61 +3,25 @@
 #else
 
 template<typename T>
-Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::split_and_multiply(const Matrix<T>& A, const Matrix<T>& B) {
-    size_type n = A.rows();
-    
-    if (n <= 16) {
-        return NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
-    }
-    
-    // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::pad_matrices(A, B);
-    
-    if (A_padded.rows() != n) {
-        Matrix result_padded = split_and_multiply(A_padded, B_padded);
-        return BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
-    }
-    
-    // Split matrices into quadrants using direct indexing
-    size_type half = n / 2;
-    
-    // Create temporary matrices for the multiplications
-    Matrix<T> A11(half, half), A12(half, half), A21(half, half), A22(half, half);
-    Matrix<T> B11(half, half), B12(half, half), B21(half, half), B22(half, half);
-    
-    // Copy quadrants using direct indexing (no submatrix overhead)
-    for (size_type i = 0; i < half; ++i) {
-        for (size_type j = 0; j < half; ++j) {
-            A11(i, j) = A(i, j);
-            A12(i, j) = A(i, j + half);
-            A21(i, j) = A(i + half, j);
-            A22(i, j) = A(i + half, j + half);
-            
-            B11(i, j) = B(i, j);
-            B12(i, j) = B(i, j + half);
-            B21(i, j) = B(i + half, j);
-            B22(i, j) = B(i + half, j + half);
-        }
-    }
-    
+Matrix<T>* Matrix<T>::WinogradMatrixMultiplicationAlgorithm::compute_from_blocks(const Matrix<T>* A_blocks, const Matrix<T>* B_blocks) {
     // Winograd's algorithm
-    Matrix S1 = A21 + A22;
-    Matrix S2 = S1 - A11;
-    Matrix S3 = A11 - A21;
-    Matrix S4 = A12 - S2;
+    Matrix S1 = A_blocks[2] + A_blocks[3];
+    Matrix S2 = S1 - A_blocks[0];
+    Matrix S3 = A_blocks[0] - A_blocks[2];
+    Matrix S4 = A_blocks[1] - S2;
     
-    Matrix T1 = B12 - B11;
-    Matrix T2 = B22 - T1;
-    Matrix T3 = B22 - B12;
-    Matrix T4 = T2 - B21;
+    Matrix T1 = B_blocks[1] - B_blocks[0];
+    Matrix T2 = B_blocks[3] - T1;
+    Matrix T3 = B_blocks[3] - B_blocks[1];
+    Matrix T4 = T2 - B_blocks[2];
     
-    Matrix P1 = split_and_multiply(A11, B11);
-    Matrix P2 = split_and_multiply(A12, B21);
-    Matrix P3 = split_and_multiply(S4, B22);
-    Matrix P4 = split_and_multiply(A22, T4);
-    Matrix P5 = split_and_multiply(S1, T1);
-    Matrix P6 = split_and_multiply(S2, T2);
-    Matrix P7 = split_and_multiply(S3, T3);
+    Matrix P1 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[0], B_blocks[0]);
+    Matrix P2 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[1], B_blocks[2]);
+    Matrix P3 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(S4, B_blocks[3]);
+    Matrix P4 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[3], T4);
+    Matrix P5 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(S1, T1);
+    Matrix P6 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(S2, T2);
+    Matrix P7 = WinogradMatrixMultiplicationAlgorithm::split_and_multiply(S3, T3);
     
     Matrix U1 = P1 + P2;
     Matrix U2 = P1 + P6;
@@ -67,9 +31,8 @@ Matrix<T> Matrix<T>::WinogradMatrixMultiplicationAlgorithm::split_and_multiply(c
     Matrix U6 = U3 - P4;
     Matrix U7 = U3 + P5;
     
-    // Use base class method to combine quadrants
-    Matrix<T> blocks[4] = {U1, U5, U6, U7};
-    return BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm>::combine_blocks(blocks, n);
+    Matrix<T>* blocks = new Matrix<T>[4] {U1, U5, U6, U7};
+    return blocks;
 }
 
 template<typename T>

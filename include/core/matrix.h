@@ -119,39 +119,53 @@ public:
         }
         
         protected:
-        static Matrix split_and_multiply(const Matrix& matrix, const Matrix& other) {
-            return Derived::split_and_multiply(matrix, other);
+        static Matrix split_and_multiply(const Matrix& matrix, const Matrix& other);
+
+        static Matrix* compute_from_blocks(const Matrix* A_blocks, const Matrix* B_blocks){
+            (void)A_blocks; (void)B_blocks; // Suppress unused parameter warnings
+            throw std::runtime_error("Not implemented; provides an interface for the derived class to implement.");
         }
 
         // Helper method to pad matrices to be divisible by 4
         // Common validation for divide-and-conquer algorithms
         static void validate_divide_and_conquer_inputs(const Matrix& matrix, const Matrix& other);
         
-        // Helper method to extract result from padded matrix
-        static Matrix extract_from_padded(const Matrix& padded_result, size_type original_size);
-
         // Helper method to pad odd-sized matrices with zeros
         static std::pair<Matrix, Matrix> pad_matrices(const Matrix& A, const Matrix& B);
         
         // Helper method to combine quadrants into result using direct indexing
         static Matrix combine_blocks(const Matrix* blocks, size_type n);
-
     };
 
     class StrassenMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
-        
+        static Matrix* compute_from_blocks(const Matrix* A_blocks, const Matrix* B_blocks);
+
         private:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
     };
 
     class WinogradMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<4, WinogradMatrixMultiplicationAlgorithm> {
         public:
-        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
-        
+        static Matrix* compute_from_blocks(const Matrix* A_blocks, const Matrix* B_blocks);
+
         private:
         static Matrix multiply_2x2(const Matrix& A, const Matrix& B);
+    };
+
+    class AlphaTensorMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm> {
+        public:
+        static Matrix* compute_from_blocks(const Matrix* A_blocks, const Matrix* B_blocks);
+        
+        private:
+        static const int p_size_n = 16;
+        static const int p_size_m = 49;
+
+        static int u[p_size_n * p_size_m];
+        static int v[p_size_n * p_size_m];
+        static int w[p_size_n * p_size_m];
+
+        static Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B);
     };
 
     class AutoMatrixMultiplicationAlgorithm {
@@ -173,21 +187,6 @@ public:
         
         static typename Matrix<T>::MatrixMultiplicationAlgorithm::AlgorithmType select_best_algorithm(size_type size);
         static Matrix multiply(const Matrix& matrix, const Matrix& other);
-    };
-
-    class AlphaTensorMatrixMultiplicationAlgorithm : public BlockMatrixMultiplicationAlgorithm<16, AlphaTensorMatrixMultiplicationAlgorithm> {
-        public:
-        static Matrix split_and_multiply(const Matrix& A, const Matrix& B);
-        
-        private:
-        static const int p_size_n = 16;
-        static const int p_size_m = 49;
-
-        static int u[p_size_n * p_size_m];
-        static int v[p_size_n * p_size_m];
-        static int w[p_size_n * p_size_m];
-
-        static Matrix alpha_tensor_4x4(const Matrix& A, const Matrix& B);
     };
 
     // Matrix multiplication with algorithm selection

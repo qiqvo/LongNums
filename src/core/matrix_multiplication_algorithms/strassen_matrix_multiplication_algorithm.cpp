@@ -4,62 +4,23 @@
 
 // StrassenMatrixMultiplicationAlgorithm class implementation
 template<typename T>
-Matrix<T> Matrix<T>::StrassenMatrixMultiplicationAlgorithm::split_and_multiply(const Matrix<T>& A, const Matrix<T>& B) {
-    size_type n = A.rows();
-    
-    // Use naive for small matrices to avoid overhead
-    if (n <= 16) {
-        return NaiveMatrixMultiplicationAlgorithm::multiply(A, B);
-    }
-    
-    // Use parent class helper methods for padding
-    auto [A_padded, B_padded] = BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::pad_matrices(A, B);
-    
-    if (A_padded.rows() != n) {
-        Matrix result_padded = split_and_multiply(A_padded, B_padded);
-        return BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::extract_from_padded(result_padded, n);
-    }
-    
-    // Split matrices into quadrants using direct indexing
-    size_type half = n / 2;
-    
-    // Create temporary matrices for the seven multiplications
-    Matrix<T> A11(half, half), A12(half, half), A21(half, half), A22(half, half);
-    Matrix<T> B11(half, half), B12(half, half), B21(half, half), B22(half, half);
-    
-    // Copy quadrants using direct indexing (no submatrix overhead)
-    for (size_type i = 0; i < half; ++i) {
-        for (size_type j = 0; j < half; ++j) {
-            A11(i, j) = A(i, j);
-            A12(i, j) = A(i, j + half);
-            A21(i, j) = A(i + half, j);
-            A22(i, j) = A(i + half, j + half);
-            
-            B11(i, j) = B(i, j);
-            B12(i, j) = B(i, j + half);
-            B21(i, j) = B(i + half, j);
-            B22(i, j) = B(i + half, j + half);
-        }
-    }
-    
-    // Strassen's seven multiplications
-    Matrix P1 = split_and_multiply(A11, B12 - B22);
-    Matrix P2 = split_and_multiply(A11 + A12, B22);
-    Matrix P3 = split_and_multiply(A21 + A22, B11);
-    Matrix P4 = split_and_multiply(A22, B21 - B11);
-    Matrix P5 = split_and_multiply(A11 + A22, B11 + B22);
-    Matrix P6 = split_and_multiply(A12 - A22, B21 + B22);
-    Matrix P7 = split_and_multiply(A11 - A21, B11 + B12);
+Matrix<T>* Matrix<T>::StrassenMatrixMultiplicationAlgorithm::compute_from_blocks(const Matrix<T>* A_blocks, const Matrix<T>* B_blocks) {
+    Matrix<T> P1 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[0], B_blocks[1] - B_blocks[3]);
+    Matrix<T> P2 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[0] + A_blocks[1], B_blocks[3]);
+    Matrix<T> P3 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[2] + A_blocks[3], B_blocks[0]);
+    Matrix<T> P4 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[3], B_blocks[2] - B_blocks[0]);
+    Matrix<T> P5 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[0] + A_blocks[3], B_blocks[0] + B_blocks[3]);
+    Matrix<T> P6 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[1] - A_blocks[3], B_blocks[2] + B_blocks[3]);
+    Matrix<T> P7 = StrassenMatrixMultiplicationAlgorithm::split_and_multiply(A_blocks[0] - A_blocks[2], B_blocks[0] + B_blocks[1]);
     
     // Combine results
-    Matrix C11 = P5 + P4 - P2 + P6;
-    Matrix C12 = P1 + P2;
-    Matrix C21 = P3 + P4;
-    Matrix C22 = P5 + P1 - P3 - P7;
+    Matrix<T> C11 = P5 + P4 - P2 + P6;
+    Matrix<T> C12 = P1 + P2;
+    Matrix<T> C21 = P3 + P4;
+    Matrix<T> C22 = P5 + P1 - P3 - P7;
     
-    // Use base class method to combine quadrants
-    Matrix<T> blocks[4] = {C11, C12, C21, C22};
-    return BlockMatrixMultiplicationAlgorithm<4, StrassenMatrixMultiplicationAlgorithm>::combine_blocks(blocks, n);
+    Matrix<T>* blocks = new Matrix<T>[4] {C11, C12, C21, C22};
+    return blocks;
 }
 
 template<typename T>
