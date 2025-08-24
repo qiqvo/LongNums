@@ -40,7 +40,6 @@ ext_modules = [
             "auto_matrix_multiplication_algorithm.cpp",
             "src/core/matrix_multiplication_algorithms/"
             "alpha_tensor_matrix_multiplication_algorithm.cpp",
-            "src/core/matrix_multiply.cpp",
             "src/core/matrix_utils.cpp",
             "src/core/real.cpp",
             "src/core/strassen_mul.cpp",
