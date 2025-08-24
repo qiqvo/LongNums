@@ -9,7 +9,6 @@ g++ -std=c++17 -O2 -march=native -Wall -Wextra \
     src/core/long.cpp \
     src/core/math.cpp \
     src/core/matrix_core.cpp \
-    src/core/matrix_multiply.cpp \
     src/core/matrix_utils.cpp \
     src/core/real.cpp \
     src/core/matrix_multiplication_algorithms/matrix_multiplication_algorithm.cpp \

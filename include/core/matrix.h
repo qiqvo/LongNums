@@ -283,7 +283,6 @@ Matrix<T> create_random_normal(size_type rows, size_type cols,
 #include "../../src/core/matrix_multiplication_algorithms/winograd_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/auto_matrix_multiplication_algorithm.cpp"
 #include "../../src/core/matrix_multiplication_algorithms/alpha_tensor_matrix_multiplication_algorithm.cpp"
-#include "../../src/core/matrix_multiply.cpp"
 #include "../../src/core/matrix_utils.cpp"
 
 #endif // MATRIX_H 
